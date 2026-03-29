@@ -26,8 +26,8 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-        scrolled ? "bg-nav-hover shadow-lg" : "bg-transparent hover:bg-nav-hover"
+      className={`fixed top-0 left-0 right-0 z-50 bg-nav transition-shadow duration-300 ${
+        scrolled ? "shadow-lg" : ""
       }`}
     >
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
@@ -40,7 +40,7 @@ const Header = () => {
             <a
               key={link.label}
               href={link.href}
-              className="flex items-center gap-1 text-sm font-medium text-foreground/90 hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
             >
               {link.label}
               {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
