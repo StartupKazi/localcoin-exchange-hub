@@ -337,13 +337,13 @@ export const TradeDialog = ({
                 </div>
                 <input
                   type="text"
-                  value={isBuy ? payAmount : payAmount}
-                  onChange={(e) => setPayAmount(e.target.value)}
-                  placeholder=""
+                  value={payAmount}
+                  onChange={(e) => handlePayChange(e.target.value)}
+                  placeholder="0.00"
                   className="flex-1 bg-transparent outline-none text-sm text-foreground"
                 />
                 <span className="text-sm text-muted-foreground">{isBuy ? offer.currency : selectedCrypto}</span>
-                <button className="text-primary text-sm font-medium">All</button>
+                <button onClick={handleAllPay} className="text-primary text-sm font-medium">All</button>
               </div>
             </div>
             {!isBuy && (
@@ -363,12 +363,12 @@ export const TradeDialog = ({
               <input
                 type="text"
                 value={receiveAmount}
-                onChange={(e) => setReceiveAmount(e.target.value)}
-                placeholder=""
+                onChange={(e) => handleReceiveChange(e.target.value)}
+                placeholder="0.00"
                 className="flex-1 bg-transparent outline-none text-sm text-foreground"
               />
               <span className="text-sm text-muted-foreground">{isBuy ? selectedCrypto : offer.currency}</span>
-              <button className="text-primary text-sm font-medium">All</button>
+              <button onClick={handleAllReceive} className="text-primary text-sm font-medium">All</button>
             </div>
           </div>
 
