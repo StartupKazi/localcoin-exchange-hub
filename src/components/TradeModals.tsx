@@ -156,6 +156,7 @@ export const TradeDialog = ({
   const [payAmount, setPayAmount] = useState("");
   const [receiveAmount, setReceiveAmount] = useState("");
   const [lastEdited, setLastEdited] = useState<"pay" | "receive">("pay");
+  const [selectedPayment, setSelectedPayment] = useState("");
   const [paymentDropdownOpen, setPaymentDropdownOpen] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
   const [showDosAndDonts, setShowDosAndDonts] = useState(false);
