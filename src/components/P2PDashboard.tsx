@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Shield, Clock, ChevronRight } from "lucide-react";
+import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw } from "lucide-react";
 
+// ─── Data ────────────────────────────────────────────────────────────
 type TradeOffer = {
   id: number;
   merchant: string;
@@ -11,161 +12,291 @@ type TradeOffer = {
   available: string;
   limit: string;
   paymentMethods: string[];
+  time: string;
+  eligible: boolean;
 };
 
 const buyOffers: TradeOffer[] = [
-  { id: 1, merchant: "CryptoKing_KE", completionRate: "98.2%", orders: 1245, price: "130.08", currency: "KES", available: "45,000 USDT", limit: "5,000 - 500,000 KES", paymentMethods: ["M-Pesa", "Bank Transfer"] },
-  { id: 2, merchant: "SafeTrade254", completionRate: "97.8%", orders: 892, price: "130.22", currency: "KES", available: "12,500 USDT", limit: "10,000 - 250,000 KES", paymentMethods: ["M-Pesa"] },
-  { id: 3, merchant: "BlockGlobal_10", completionRate: "99.1%", orders: 3201, price: "130.27", currency: "KES", available: "88,000 USDT", limit: "1,000 - 1,000,000 KES", paymentMethods: ["Bank Transfer", "Airtel Money"] },
-  { id: 4, merchant: "NairobiCrypto", completionRate: "96.5%", orders: 567, price: "130.27", currency: "KES", available: "8,200 USDT", limit: "5,000 - 150,000 KES", paymentMethods: ["M-Pesa", "Cash Deposit"] },
-  { id: 5, merchant: "SwiftBTC", completionRate: "99.4%", orders: 4510, price: "130.30", currency: "KES", available: "120,000 USDT", limit: "2,000 - 800,000 KES", paymentMethods: ["M-Pesa", "Bank Transfer"] },
-  { id: 6, merchant: "CoinMaster_KE", completionRate: "95.9%", orders: 321, price: "130.34", currency: "KES", available: "6,800 USDT", limit: "3,000 - 100,000 KES", paymentMethods: ["Airtel Money"] },
+  { id: 1, merchant: "Lunex.", completionRate: "96 %", orders: 1116, price: "130.40", currency: "KES", available: "138.2111 USDT", limit: "1,500.00 ~ 18,022.72 KES", paymentMethods: ["M-pesa Paybill"], time: "15m", eligible: false },
+  { id: 2, merchant: "FrankTheCrypto_", completionRate: "99 %", orders: 2296, price: "130.40", currency: "KES", available: "245.4271 USDT", limit: "10,000.00 ~ 32,003.69 KES", paymentMethods: ["I&M Bank", "M-pesa Paybill"], time: "15m", eligible: false },
+  { id: 3, merchant: "Hezzy254", completionRate: "98 %", orders: 264, price: "130.40", currency: "KES", available: "274.7078 USDT", limit: "800.00 ~ 35,821.89 KES", paymentMethods: ["I&M Bank", "M-pesa Paybill"], time: "15m", eligible: false },
+  { id: 4, merchant: "Abdul 10", completionRate: "97 %", orders: 35, price: "130.44", currency: "KES", available: "740.4466 USDT", limit: "10,000.00 ~ 96,583.85 KES", paymentMethods: ["M-Pesa Kenya(Safarico...", "Equity", "M-pesa Paybill"], time: "15m", eligible: false },
+  { id: 5, merchant: "Goldy", completionRate: "100 %", orders: 290, price: "130.49", currency: "KES", available: "387.7910 USDT", limit: "500.00 ~ 1,000.00 KES", paymentMethods: ["M-Pesa Kenya(Safarico..."], time: "15m", eligible: true },
+  { id: 6, merchant: "Bahari23", completionRate: "98 %", orders: 1598, price: "130.49", currency: "KES", available: "4,723.6839 USDT", limit: "1,000.00 ~ 616,393.51 KES", paymentMethods: ["I&M Bank"], time: "30m", eligible: false },
+  { id: 7, merchant: "Kadosh25", completionRate: "98 %", orders: 1198, price: "130.60", currency: "KES", available: "93.9717 USDT", limit: "300.00 ~ 12,272.70 KES", paymentMethods: ["I&M Bank", "M-pesa Paybill", "Bank Transfer"], time: "30m", eligible: true },
+  { id: 8, merchant: "Joshua102", completionRate: "99 %", orders: 984, price: "130.88", currency: "KES", available: "9,192.5946 USDT", limit: "4,000.00 ~ 486,586.00 KES", paymentMethods: ["M-pesa Paybill"], time: "30m", eligible: false },
 ];
 
-const cryptos = ["USDT", "BTC", "ETH", "USDC", "BNB", "SOL"];
+const cryptos = ["USDT", "BTC", "ETH", "USDC", "TRX", "BNB", "TRUMP 🔥", "SOL", "SUI"];
 const fiats = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
-const payments = ["All Payments", "M-Pesa", "Bank Transfer", "Airtel Money", "Cash Deposit"];
+const payments = ["All Payment Methods", "M-Pesa", "Bank Transfer", "Airtel Money", "Cash Deposit"];
 
-const TradeTable = () => {
-  const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
-  const [selectedCrypto, setSelectedCrypto] = useState("USDT");
+// ─── Page Title ──────────────────────────────────────────────────────
+const PageTitle = () => (
+  <div className="pt-6 pb-2">
+    <h1 className="text-xl font-bold text-foreground">
+      Buy USDT with KES via P2P
+    </h1>
+  </div>
+);
+
+// ─── Promo Banner ────────────────────────────────────────────────────
+const PromoBanner = () => (
+  <div className="bg-card rounded-xl p-6 flex items-center justify-between border border-border/40">
+    <div className="text-center flex-1">
+      <h2 className="text-xl font-bold text-foreground">LocalCoin Fiat Spring Blossom</h2>
+      <p className="text-muted-foreground text-sm mt-1">
+        Deposit, trade & share a 15,500 USDT prize pool! <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs ml-1">→</span>
+      </p>
+    </div>
+  </div>
+);
+
+// ─── Announce Ribbon ─────────────────────────────────────────────────
+const AnnounceRibbon = () => (
+  <div className="bg-primary/10 border-b border-primary/20 px-4 py-2.5 flex items-center gap-2 text-sm rounded-t-xl overflow-hidden">
+    <span className="font-bold text-primary italic shrink-0">Super</span>
+    <p className="text-foreground/80 truncate">
+      Make a first deposit of at least 10 USDT via P2P trading. Earn a lucky draw ticket for a chance to win a 99 USDT P2P Super Deal Coupon, or get a chance to win exciting physical prizes! It's on a first-come, first-served basis.
+    </p>
+    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+  </div>
+);
+
+// ─── Buy/Sell + Crypto Tabs ──────────────────────────────────────────
+const ActionTabs = ({
+  activeTab,
+  setActiveTab,
+  selectedCrypto,
+  setSelectedCrypto,
+}: {
+  activeTab: "buy" | "sell";
+  setActiveTab: (t: "buy" | "sell") => void;
+  selectedCrypto: string;
+  setSelectedCrypto: (c: string) => void;
+}) => (
+  <div className="px-4 pt-4 pb-3 flex flex-wrap items-center gap-4">
+    {/* Buy / Sell pill buttons */}
+    <div className="flex rounded-full border border-border overflow-hidden">
+      <button
+        onClick={() => setActiveTab("buy")}
+        className={`px-7 py-2 text-sm font-semibold transition-colors ${
+          activeTab === "buy"
+            ? "bg-success text-white"
+            : "bg-card text-foreground hover:bg-muted/30"
+        }`}
+      >
+        Buy
+      </button>
+      <button
+        onClick={() => setActiveTab("sell")}
+        className={`px-7 py-2 text-sm font-semibold transition-colors ${
+          activeTab === "sell"
+            ? "bg-foreground text-card"
+            : "bg-card text-foreground hover:bg-muted/30"
+        }`}
+      >
+        Sell
+      </button>
+    </div>
+
+    {/* Crypto tabs */}
+    <div className="flex items-center gap-1 flex-wrap">
+      {cryptos.map((c) => (
+        <button
+          key={c}
+          onClick={() => setSelectedCrypto(c.replace(" 🔥", ""))}
+          className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+            selectedCrypto === c.replace(" 🔥", "")
+              ? "text-primary font-semibold"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {c}
+        </button>
+      ))}
+      <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-0.5 ml-1">
+        Supports 300+ Cryptos <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  </div>
+);
+
+// ─── Filter Row ──────────────────────────────────────────────────────
+const FilterRow = () => (
+  <div className="px-4 pb-3 flex flex-wrap items-center gap-3">
+    {/* Amount input */}
+    <div className="flex items-center border border-border rounded-lg overflow-hidden bg-card">
+      <input
+        type="text"
+        placeholder="Enter Amount"
+        className="px-3 py-2 text-sm bg-transparent outline-none w-32 text-foreground placeholder:text-muted-foreground"
+      />
+      <div className="flex items-center gap-1.5 px-3 py-2 border-l border-border text-sm text-foreground">
+        <div className="w-4 h-4 rounded-full bg-success flex items-center justify-center text-white text-[8px] font-bold">K</div>
+        KES
+        <ChevronRight className="h-3 w-3 text-muted-foreground rotate-90" />
+      </div>
+    </div>
+
+    {/* Payment Methods dropdown */}
+    <select className="text-sm bg-card text-foreground rounded-lg px-3 py-2 border border-border appearance-none pr-8 cursor-pointer">
+      {payments.map((p) => (
+        <option key={p}>{p}</option>
+      ))}
+    </select>
+
+    {/* Refresh settings */}
+    <button className="flex items-center gap-1.5 text-sm text-foreground border border-border rounded-lg px-3 py-2 bg-card hover:bg-muted/30">
+      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+      Refresh settin...
+      <ChevronRight className="h-3 w-3 text-muted-foreground rotate-90" />
+    </button>
+
+    {/* Filter button */}
+    <button className="flex items-center gap-1.5 text-sm text-foreground hover:text-primary">
+      Filter <Filter className="h-3.5 w-3.5" />
+    </button>
+  </div>
+);
+
+// ─── Marquee Announcement ────────────────────────────────────────────
+const MarqueeAnnouncement = () => (
+  <div className="px-4 py-2.5 border-t border-b border-border/40 flex items-start gap-2 text-sm text-muted-foreground">
+    <Volume2 className="h-4 w-4 shrink-0 mt-0.5" />
+    <p className="truncate">
+      ...are personal contact details, such as phone numbers or email addresses. Always verify information independently and do not rely on screenshots. LocalCoin Trade never escrows a...
+    </p>
+  </div>
+);
+
+// ─── Trade Table ─────────────────────────────────────────────────────
+const TradeTable = ({
+  activeTab,
+  selectedCrypto,
+}: {
+  activeTab: "buy" | "sell";
+  selectedCrypto: string;
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 5;
 
   return (
-    <section className="bg-surface-light rounded-xl shadow-xl animate-fade-in">
-      {/* Tabs */}
-      <div className="flex border-b border-border/20">
-        {(["buy", "sell"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-8 py-4 text-sm font-bold uppercase tracking-wide transition-colors ${
-              activeTab === tab
-                ? tab === "buy"
-                  ? "text-success border-b-2 border-success"
-                  : "text-destructive border-b-2 border-destructive"
-                : "text-muted-foreground hover:text-surface-light-foreground"
-            }`}
+    <div>
+      {/* Table Header */}
+      <div className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1.2fr] px-4 py-3 text-xs text-muted-foreground border-b border-border/30">
+        <span>Advertiser</span>
+        <span>Price</span>
+        <span>Available|Limits</span>
+        <span>Payment Method</span>
+        <span className="text-right text-primary">Taker 0 Transaction Fees</span>
+      </div>
+
+      {/* Rows */}
+      <div className="divide-y divide-border/30">
+        {buyOffers.map((offer) => (
+          <div
+            key={offer.id}
+            className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1.2fr] px-4 py-5 items-center hover:bg-muted/20 transition-colors"
           >
-            {tab}
-          </button>
+            {/* Advertiser */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-bold text-sm">
+                {offer.merchant[0]}
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-semibold text-foreground">{offer.merchant}</span>
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                  <span>{offer.orders.toLocaleString()} Order(s)</span>
+                  <span>|</span>
+                  <span>{offer.completionRate}</span>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                  <Clock className="h-3 w-3" />
+                  <span>{offer.time}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Price */}
+            <div>
+              <span className="text-2xl font-bold text-foreground">{offer.price}</span>
+              <span className="text-xs text-muted-foreground ml-1.5">{offer.currency}</span>
+            </div>
+
+            {/* Available / Limits */}
+            <div>
+              <div className="text-sm font-medium text-foreground">{offer.available}</div>
+              <div className="text-sm text-muted-foreground mt-0.5">{offer.limit}</div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="flex flex-wrap gap-1.5">
+              {offer.paymentMethods.map((pm) => (
+                <span
+                  key={pm}
+                  className="text-xs px-2.5 py-1 rounded border border-border bg-card text-foreground"
+                >
+                  {pm}
+                </span>
+              ))}
+            </div>
+
+            {/* Action */}
+            <div className="text-right">
+              {offer.eligible ? (
+                <button className="px-6 py-2.5 rounded-full bg-success text-white text-sm font-semibold hover:brightness-110 transition-all">
+                  {activeTab === "buy" ? "Buy" : "Sell"} {selectedCrypto}
+                </button>
+              ) : (
+                <button className="px-6 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">
+                  ineligible
+                </button>
+              )}
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="p-4 flex flex-wrap items-center gap-3 border-b border-border/10">
-        {/* Crypto selector */}
-        <div className="flex gap-1 bg-muted/10 rounded-lg p-1">
-          {cryptos.map((c) => (
-            <button
-              key={c}
-              onClick={() => setSelectedCrypto(c)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                selectedCrypto === c
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-surface-light-foreground"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-
-        <select className="text-xs bg-secondary/30 text-surface-light-foreground rounded-md px-3 py-2 border border-border/20">
-          {fiats.map((f) => (
-            <option key={f}>{f}</option>
-          ))}
-        </select>
-
-        <select className="text-xs bg-secondary/30 text-surface-light-foreground rounded-md px-3 py-2 border border-border/20">
-          {payments.map((p) => (
-            <option key={p}>{p}</option>
-          ))}
-        </select>
+      {/* Pagination */}
+      <div className="flex items-center justify-end gap-1 px-4 py-4 border-t border-border/30">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          className="w-8 h-8 rounded flex items-center justify-center text-muted-foreground hover:bg-muted/30"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <button
+            key={page}
+            onClick={() => setCurrentPage(page)}
+            className={`w-8 h-8 rounded text-sm font-medium flex items-center justify-center transition-colors ${
+              currentPage === page
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-muted/30"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          className="w-8 h-8 rounded flex items-center justify-center text-muted-foreground hover:bg-muted/30"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border/10">
-              <th className="text-left px-4 py-3 font-medium">Advertisers</th>
-              <th className="text-left px-4 py-3 font-medium">Price</th>
-              <th className="text-left px-4 py-3 font-medium">Available / Limit</th>
-              <th className="text-left px-4 py-3 font-medium">Payment</th>
-              <th className="text-right px-4 py-3 font-medium">Trade</th>
-            </tr>
-          </thead>
-          <tbody>
-            {buyOffers.map((offer) => (
-              <tr
-                key={offer.id}
-                className="border-b border-border/5 hover:bg-muted/5 transition-colors"
-              >
-                <td className="px-4 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-                      {offer.merchant[0]}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-semibold text-surface-light-foreground">
-                          {offer.merchant}
-                        </span>
-                        <Shield className="h-3.5 w-3.5 text-success" />
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                        <span>{offer.orders} orders</span>
-                        <span>·</span>
-                        <span>{offer.completionRate} completion</span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <span className="text-lg font-bold text-surface-light-foreground">
-                    {offer.price}
-                  </span>
-                  <span className="text-xs text-muted-foreground ml-1">{offer.currency}</span>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="text-sm text-surface-light-foreground">{offer.available}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{offer.limit}</div>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    {offer.paymentMethods.map((pm) => (
-                      <span
-                        key={pm}
-                        className="text-xs px-2 py-0.5 rounded bg-muted/10 text-muted-foreground border border-border/10"
-                      >
-                        {pm}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-right">
-                  <button
-                    className={`px-5 py-2 rounded-md text-sm font-semibold transition-all ${
-                      activeTab === "buy"
-                        ? "bg-success text-white hover:brightness-110"
-                        : "bg-destructive text-white hover:brightness-110"
-                    }`}
-                  >
-                    {activeTab === "buy" ? "Buy" : "Sell"} {selectedCrypto}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+    </div>
   );
 };
 
+// ─── Below-the-fold sections ─────────────────────────────────────────
 const HowItWorks = () => (
-  <section className="bg-surface-light rounded-xl p-8 shadow-lg animate-fade-in">
-    <h2 className="text-2xl font-bold text-surface-light-foreground mb-2">
+  <section className="bg-card rounded-xl p-8 shadow-sm border border-border/30">
+    <h2 className="text-2xl font-bold text-foreground mb-2">
       Buy USDT with KES in 3 easy steps
     </h2>
     <p className="text-muted-foreground text-sm mb-8">
@@ -181,7 +312,7 @@ const HowItWorks = () => (
           <div className="w-14 h-14 rounded-full bg-primary/10 text-primary font-bold text-xl flex items-center justify-center mx-auto mb-4">
             {item.step}
           </div>
-          <h3 className="font-semibold text-surface-light-foreground mb-2">
+          <h3 className="font-semibold text-foreground mb-2">
             Step {item.step}: {item.title}
           </h3>
           <p className="text-sm text-muted-foreground">{item.desc}</p>
@@ -192,7 +323,7 @@ const HowItWorks = () => (
 );
 
 const Benefits = () => (
-  <section className="bg-card rounded-xl p-8 shadow-lg border border-border">
+  <section className="bg-card rounded-xl p-8 shadow-sm border border-border/30">
     <div className="flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -223,8 +354,8 @@ const Benefits = () => (
 );
 
 const PaymentMethods = () => (
-  <section className="bg-surface-light rounded-xl p-8 shadow-lg">
-    <h2 className="text-2xl font-bold text-surface-light-foreground mb-2">Payment Methods</h2>
+  <section className="bg-card rounded-xl p-8 shadow-sm border border-border/30">
+    <h2 className="text-2xl font-bold text-foreground mb-2">Payment Methods</h2>
     <p className="text-sm text-muted-foreground mb-6">
       Trade easily with our popular payment methods
     </p>
@@ -233,7 +364,7 @@ const PaymentMethods = () => (
         (method) => (
           <div
             key={method}
-            className="px-4 py-3 rounded-lg border border-border/20 text-sm text-surface-light-foreground text-center hover:border-primary/40 transition-colors cursor-pointer"
+            className="px-4 py-3 rounded-lg border border-border text-sm text-foreground text-center hover:border-primary/40 transition-colors cursor-pointer"
           >
             {method}
           </div>
@@ -254,7 +385,7 @@ const FAQs = () => {
   ];
 
   return (
-    <section className="bg-card rounded-xl p-8 shadow-lg border border-border">
+    <section className="bg-card rounded-xl p-8 shadow-sm border border-border/30">
       <h2 className="text-2xl font-bold text-foreground mb-6">FAQs</h2>
       <div className="space-y-2">
         {faqs.map((faq, i) => (
@@ -280,20 +411,34 @@ const FAQs = () => {
   );
 };
 
+// ─── Main Dashboard ──────────────────────────────────────────────────
 const P2PDashboard = () => {
+  const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
+  const [selectedCrypto, setSelectedCrypto] = useState("USDT");
+
   return (
-    <div className="w-full px-4 md:px-8 lg:px-12 space-y-10">
-      {/* Hero tagline */}
-      <div className="text-center pt-4">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground">
-          Buy & Sell Crypto <span className="text-primary">P2P</span>
-        </h1>
-        <p className="text-muted-foreground mt-2 flex items-center justify-center gap-2">
-          <Clock className="h-4 w-4" /> Fast, secure, and fee-free trading
-        </p>
+    <div className="w-full px-4 md:px-8 lg:px-12 space-y-6 pb-12">
+      {/* 1. Page Title */}
+      <PageTitle />
+
+      {/* 2. Promo Section */}
+      <PromoBanner />
+
+      {/* 3. Main Trade Dashboard */}
+      <div className="bg-card rounded-xl shadow-sm border border-border/30 overflow-hidden">
+        <AnnounceRibbon />
+        <ActionTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          selectedCrypto={selectedCrypto}
+          setSelectedCrypto={setSelectedCrypto}
+        />
+        <FilterRow />
+        <MarqueeAnnouncement />
+        <TradeTable activeTab={activeTab} selectedCrypto={selectedCrypto} />
       </div>
 
-      <TradeTable />
+      {/* Below the fold */}
       <HowItWorks />
       <Benefits />
       <PaymentMethods />
