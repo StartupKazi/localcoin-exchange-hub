@@ -36,7 +36,6 @@ const Header = () => {
               className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
             >
               {link.label}
-              {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
             </a>
           ))}
         </nav>
