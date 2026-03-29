@@ -1,18 +1,10 @@
 import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
-  { label: "Home", href: "#" },
-  { label: "Buy", href: "#", hasDropdown: true },
-  { label: "Sell", href: "#", hasDropdown: true },
-  { label: "Advertisements", href: "#" },
-  { label: "Trades", href: "#", hasDropdown: true },
-  { label: "Wallets", href: "#" },
-  { label: "Transactions", href: "#" },
-  { label: "Contact", href: "#" },
-  { label: "More", href: "#", hasDropdown: true },
-  { label: "Notifications", href: "#" },
+  { label: "One-Click Buy", href: "/one-click-buy" },
+  { label: "P2P", href: "/" },
 ];
 
 const Header = () => {
@@ -43,7 +35,6 @@ const Header = () => {
               className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
             >
               {link.label}
-              {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
             </a>
           ))}
         </nav>
