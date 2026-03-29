@@ -203,12 +203,17 @@ const FilterRow = () => (
 );
 
 // ─── Marquee Announcement ────────────────────────────────────────────
+const marqueeText =
+  "Please be cautious of scammers who may share personal contact details, such as phone numbers or email addresses. Always verify information independently and do not rely on screenshots. LocalCoin Trade never escrows any asset other than the asset you are purchasing. If you encounter any suspicious activity, report it immediately.";
+
 const MarqueeAnnouncement = () => (
-  <div className="px-4 py-2.5 border-t border-b border-border/40 flex items-start gap-2 text-sm text-muted-foreground">
-    <Volume2 className="h-4 w-4 shrink-0 mt-0.5" />
-    <p className="truncate">
-      ...are personal contact details, such as phone numbers or email addresses. Always verify information independently and do not rely on screenshots. LocalCoin Trade never escrows a...
-    </p>
+  <div className="px-4 py-2.5 border-t border-b border-border/40 flex items-center gap-2 text-sm text-muted-foreground overflow-hidden">
+    <Volume2 className="h-4 w-4 shrink-0" />
+    <div className="overflow-hidden whitespace-nowrap flex-1">
+      <p className="inline-block animate-marquee whitespace-nowrap">
+        {marqueeText}
+      </p>
+    </div>
   </div>
 );
 
