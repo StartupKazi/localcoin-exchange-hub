@@ -762,6 +762,7 @@ const FAQs = () => {
 const P2PDashboard = () => {
   const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
   const [selectedCrypto, setSelectedCrypto] = useState("USDT");
+  const [selectedFiat, setSelectedFiat] = useState("KES");
 
   return (
     <div className="w-full px-4 md:px-8 lg:px-12 space-y-6 pb-12">
@@ -780,7 +781,7 @@ const P2PDashboard = () => {
           selectedCrypto={selectedCrypto}
           setSelectedCrypto={setSelectedCrypto}
         />
-        <FilterRow />
+        <FilterRow selectedFiat={selectedFiat} setSelectedFiat={setSelectedFiat} />
         <MarqueeAnnouncement />
         <TradeTable activeTab={activeTab} selectedCrypto={selectedCrypto} />
       </div>
