@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
