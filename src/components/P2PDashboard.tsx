@@ -40,17 +40,59 @@ const PageTitle = () => (
   </div>
 );
 
-// ─── Promo Banner ────────────────────────────────────────────────────
-const PromoBanner = () => (
-  <div className="bg-card rounded-xl p-6 flex items-center justify-between border border-border/40">
-    <div className="text-center flex-1">
-      <h2 className="text-xl font-bold text-foreground">LocalCoin Fiat Spring Blossom</h2>
-      <p className="text-muted-foreground text-sm mt-1">
-        Deposit, trade & share a 15,500 USDT prize pool! <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs ml-1">→</span>
-      </p>
+// ─── Promo Banner (Carousel) ─────────────────────────────────────────
+const promoSlides = [
+  {
+    title: "LocalCoin Fiat Spring Blossom",
+    description: "Deposit, trade & share a 15,500 USDT prize pool!",
+  },
+  {
+    title: "Maker Referral Program",
+    description: "Invite P2P makers and earn together.",
+  },
+  {
+    title: "Zero-Fee Trading Week",
+    description: "Trade with 0% maker fees this week only!",
+  },
+];
+
+const PromoBanner = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Auto-slide every 4 seconds
+  useState(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % promoSlides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  });
+
+  const slide = promoSlides[activeSlide];
+
+  return (
+    <div className="bg-card rounded-xl p-6 border border-border/40">
+      <div className="text-center flex-1 min-h-[48px] flex flex-col items-center justify-center">
+        <h2 className="text-xl font-bold text-foreground">{slide.title}</h2>
+        <p className="text-muted-foreground text-sm mt-1">
+          {slide.description}{" "}
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs ml-1">→</span>
+        </p>
+      </div>
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center gap-1.5 mt-4">
+        {promoSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveSlide(i)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === activeSlide ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/30"
+            }`}
+          />
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ─── Announce Ribbon ─────────────────────────────────────────────────
 const AnnounceRibbon = () => (
