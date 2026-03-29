@@ -60,7 +60,7 @@ const PromoBanner = () => {
   const [activeSlide, setActiveSlide] = useState(0);
 
   // Auto-slide every 4 seconds
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % promoSlides.length);
     }, 4000);
