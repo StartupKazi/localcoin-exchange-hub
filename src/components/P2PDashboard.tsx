@@ -27,6 +27,15 @@ const buyOffers: TradeOffer[] = [
   { id: 8, merchant: "Joshua102", completionRate: "99 %", orders: 984, price: "130.88", currency: "KES", available: "9,192.5946 USDT", limit: "4,000.00 ~ 486,586.00 KES", paymentMethods: ["M-pesa Paybill"], time: "30m", eligible: false },
 ];
 
+const sellOffers: TradeOffer[] = [
+  { id: 101, merchant: "CryptoKe_", completionRate: "97 %", orders: 1842, price: "129.80", currency: "KES", available: "512.3400 USDT", limit: "5,000.00 ~ 66,501.72 KES", paymentMethods: ["M-Pesa Kenya(Safarico...", "Bank Transfer"], time: "15m", eligible: true },
+  { id: 102, merchant: "Mkenya001", completionRate: "99 %", orders: 3104, price: "129.75", currency: "KES", available: "1,200.0000 USDT", limit: "2,000.00 ~ 155,700.00 KES", paymentMethods: ["M-pesa Paybill"], time: "15m", eligible: false },
+  { id: 103, merchant: "Swapper_KE", completionRate: "95 %", orders: 876, price: "129.70", currency: "KES", available: "89.5000 USDT", limit: "500.00 ~ 11,608.15 KES", paymentMethods: ["I&M Bank", "M-pesa Paybill"], time: "15m", eligible: true },
+  { id: 104, merchant: "TradeHub254", completionRate: "98 %", orders: 2450, price: "129.65", currency: "KES", available: "3,450.7800 USDT", limit: "10,000.00 ~ 447,442.70 KES", paymentMethods: ["Equity", "M-pesa Paybill", "Bank Transfer"], time: "30m", eligible: false },
+  { id: 105, merchant: "NairobiTrader", completionRate: "100 %", orders: 195, price: "129.60", currency: "KES", available: "620.0000 USDT", limit: "1,000.00 ~ 80,352.00 KES", paymentMethods: ["M-Pesa Kenya(Safarico..."], time: "15m", eligible: true },
+  { id: 106, merchant: "FastCash_KE", completionRate: "96 %", orders: 1320, price: "129.55", currency: "KES", available: "2,100.0000 USDT", limit: "3,000.00 ~ 272,055.00 KES", paymentMethods: ["I&M Bank"], time: "30m", eligible: false },
+];
+
 const cryptos = ["USDT", "BTC", "ETH", "USDC", "TRX", "BNB", "TRUMP 🔥", "SOL", "SUI"];
 const fiats = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
 const payments = ["All Payment Methods", "M-Pesa", "Bank Transfer", "Airtel Money", "Cash Deposit"];
@@ -256,7 +265,7 @@ const TradeTable = ({
 
       {/* Rows */}
       <div className="divide-y divide-border/30">
-        {buyOffers.map((offer) => (
+        {(activeTab === "buy" ? buyOffers : sellOffers).map((offer) => (
           <div
             key={offer.id}
             className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1.2fr] px-4 py-5 items-center hover:bg-muted/20 transition-colors"
