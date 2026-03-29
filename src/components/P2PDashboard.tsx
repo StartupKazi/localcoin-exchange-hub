@@ -203,19 +203,34 @@ const FilterRow = () => (
 );
 
 // ─── Marquee Announcement ────────────────────────────────────────────
-const marqueeText =
-  "Please be cautious of scammers who may share personal contact details, such as phone numbers or email addresses. Always verify information independently and do not rely on screenshots. LocalCoin Trade never escrows any asset other than the asset you are purchasing. If you encounter any suspicious activity, report it immediately.";
+const marqueeMessages = [
+  "Please be cautious of scammers who may share personal contact details, such as phone numbers or email addresses. Always verify information independently and do not rely on screenshots.",
+  "LocalCoin Trade never escrows any asset other than the asset you are purchasing. If you encounter any suspicious activity, report it immediately.",
+  "Never share your account password, 2FA codes, or private keys with anyone. LocalCoin Trade support will never ask for these details.",
+  "Ensure you only release crypto after confirming payment has been received in your account. Do not rely on screenshots as proof of payment.",
+];
 
-const MarqueeAnnouncement = () => (
-  <div className="px-4 py-2.5 border-t border-b border-border/40 flex items-center gap-2 text-sm text-muted-foreground overflow-hidden">
-    <Volume2 className="h-4 w-4 shrink-0" />
-    <div className="overflow-hidden whitespace-nowrap flex-1">
-      <p className="inline-block animate-marquee whitespace-nowrap">
-        {marqueeText}
-      </p>
+const MarqueeAnnouncement = () => {
+  const [currentMsg, setCurrentMsg] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMsg((prev) => (prev + 1) % marqueeMessages.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="px-4 py-2.5 border-t border-b border-border/40 flex items-center gap-2 text-sm text-muted-foreground overflow-hidden">
+      <Volume2 className="h-4 w-4 shrink-0" />
+      <div className="overflow-hidden whitespace-nowrap flex-1 relative">
+        <p key={currentMsg} className="inline-block animate-marquee whitespace-nowrap">
+          {marqueeMessages[currentMsg]}
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ─── Trade Table ─────────────────────────────────────────────────────
 const TradeTable = ({
