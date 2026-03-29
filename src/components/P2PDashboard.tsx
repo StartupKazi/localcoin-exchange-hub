@@ -282,7 +282,7 @@ const FAQs = () => {
 
 const P2PDashboard = () => {
   return (
-    <div className="max-w-6xl mx-auto px-4 space-y-10">
+    <div className="w-full px-4 md:px-8 lg:px-12 space-y-10">
       {/* Hero tagline */}
       <div className="text-center pt-4">
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground">
