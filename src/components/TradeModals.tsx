@@ -155,6 +155,7 @@ export const TradeDialog = ({
 }) => {
   const [payAmount, setPayAmount] = useState("");
   const [receiveAmount, setReceiveAmount] = useState("");
+  const [lastEdited, setLastEdited] = useState<"pay" | "receive">("pay");
   const [selectedPayment, setSelectedPayment] = useState("");
   const [paymentDropdownOpen, setPaymentDropdownOpen] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
@@ -163,6 +164,57 @@ export const TradeDialog = ({
 
   const isBuy = activeTab === "buy";
   const countdown = parseInt(offer.time) || 30;
+  const rate = parseFloat(offer.price);
+
+  const handlePayChange = (val: string) => {
+    setPayAmount(val);
+    setLastEdited("pay");
+    const num = parseFloat(val);
+    if (!isNaN(num) && num > 0) {
+      if (isBuy) {
+        setReceiveAmount((num / rate).toFixed(4));
+      } else {
+        setReceiveAmount((num * rate).toFixed(2));
+      }
+    } else {
+      setReceiveAmount("");
+    }
+  };
+
+  const handleReceiveChange = (val: string) => {
+    setReceiveAmount(val);
+    setLastEdited("receive");
+    const num = parseFloat(val);
+    if (!isNaN(num) && num > 0) {
+      if (isBuy) {
+        setPayAmount((num * rate).toFixed(2));
+      } else {
+        setPayAmount((num / rate).toFixed(4));
+      }
+    } else {
+      setPayAmount("");
+    }
+  };
+
+  const handleAllPay = () => {
+    const available = parseFloat(offer.available.replace(/[^0-9.]/g, ""));
+    if (isBuy) {
+      const maxKes = available * rate;
+      handlePayChange(maxKes.toFixed(2));
+    } else {
+      handlePayChange(available.toFixed(4));
+    }
+  };
+
+  const handleAllReceive = () => {
+    const available = parseFloat(offer.available.replace(/[^0-9.]/g, ""));
+    if (isBuy) {
+      handleReceiveChange(available.toFixed(4));
+    } else {
+      const maxKes = available * rate;
+      handleReceiveChange(maxKes.toFixed(2));
+    }
+  };
 
   const handleBuySell = () => {
     setShowSecurity(true);
@@ -285,13 +337,13 @@ export const TradeDialog = ({
                 </div>
                 <input
                   type="text"
-                  value={isBuy ? payAmount : payAmount}
-                  onChange={(e) => setPayAmount(e.target.value)}
-                  placeholder=""
+                  value={payAmount}
+                  onChange={(e) => handlePayChange(e.target.value)}
+                  placeholder="0.00"
                   className="flex-1 bg-transparent outline-none text-sm text-foreground"
                 />
                 <span className="text-sm text-muted-foreground">{isBuy ? offer.currency : selectedCrypto}</span>
-                <button className="text-primary text-sm font-medium">All</button>
+                <button onClick={handleAllPay} className="text-primary text-sm font-medium">All</button>
               </div>
             </div>
             {!isBuy && (
@@ -311,12 +363,12 @@ export const TradeDialog = ({
               <input
                 type="text"
                 value={receiveAmount}
-                onChange={(e) => setReceiveAmount(e.target.value)}
-                placeholder=""
+                onChange={(e) => handleReceiveChange(e.target.value)}
+                placeholder="0.00"
                 className="flex-1 bg-transparent outline-none text-sm text-foreground"
               />
               <span className="text-sm text-muted-foreground">{isBuy ? selectedCrypto : offer.currency}</span>
-              <button className="text-primary text-sm font-medium">All</button>
+              <button onClick={handleAllReceive} className="text-primary text-sm font-medium">All</button>
             </div>
           </div>
 
