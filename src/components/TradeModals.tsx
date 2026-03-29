@@ -413,28 +413,23 @@ const OrderPage = ({
     return () => clearInterval(timer);
   }, []);
 
-  if (showConfirmPayment) {
-    return (
-      <ConfirmPaymentModal
-        offer={offer}
-        payAmount={pay.toFixed(2)}
-        onClose={() => setShowConfirmPayment(false)}
-        onConfirm={() => { setShowConfirmPayment(false); onClose(); }}
-      />
-    );
-  }
-
-  if (showCancelOrder) {
-    return (
-      <CancelOrderModal
-        onClose={() => setShowCancelOrder(false)}
-        onConfirm={() => { setShowCancelOrder(false); onClose(); }}
-      />
-    );
-  }
-
   return (
     <div className="fixed inset-0 z-[90] bg-background overflow-y-auto">
+      {/* Modals rendered as overlays on top of order page */}
+      {showConfirmPayment && (
+        <ConfirmPaymentModal
+          offer={offer}
+          payAmount={pay.toFixed(2)}
+          onClose={() => setShowConfirmPayment(false)}
+          onConfirm={() => { setShowConfirmPayment(false); onClose(); }}
+        />
+      )}
+      {showCancelOrder && (
+        <CancelOrderModal
+          onClose={() => setShowCancelOrder(false)}
+          onConfirm={() => { setShowCancelOrder(false); onClose(); }}
+        />
+      )}
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
