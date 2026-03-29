@@ -773,7 +773,7 @@ const P2PDashboard = () => {
       <PromoBanner />
 
       {/* 3. Main Trade Dashboard */}
-      <div className="bg-card rounded-xl shadow-sm border border-border/30 overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm border border-border/30">
         <AnnounceRibbon />
         <ActionTabs
           activeTab={activeTab}
