@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
-import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "One-Click Buy", href: "/one-click-buy" },
