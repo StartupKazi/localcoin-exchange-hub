@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw, Search, X, Info, Flame, ChevronUp, ChevronDown } from "lucide-react";
 
 // ─── Data ────────────────────────────────────────────────────────────
 type TradeOffer = {
@@ -37,8 +37,32 @@ const sellOffers: TradeOffer[] = [
 ];
 
 const cryptos = ["USDT", "BTC", "ETH", "USDC", "TRX", "BNB", "TRUMP 🔥", "SOL", "SUI"];
-const fiats = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
-const payments = ["All Payment Methods", "M-Pesa", "Bank Transfer", "Airtel Money", "Cash Deposit"];
+const fiats = [
+  { code: "AUD", color: "#4CAF50" },
+  { code: "IDR", color: "#E91E63" },
+  { code: "NGN", color: "#4CAF50" },
+  { code: "ARS", color: "#4CAF50" },
+  { code: "EUR", color: "#3F51B5" },
+  { code: "PKR", color: "#E91E63" },
+  { code: "GHS", color: "#FF9800" },
+  { code: "KES", color: "#4CAF50" },
+  { code: "USD", color: "#4CAF50" },
+  { code: "TZS", color: "#FF9800" },
+  { code: "UGX", color: "#E91E63" },
+];
+
+const paymentMethodsList = [
+  { name: "M-Pesa Kenya(Safaricom)", popular: true },
+  { name: "M-pesa Paybill", popular: true },
+  { name: "Bank Transfer", popular: true },
+  { name: "Airtel Money", popular: false },
+  { name: "I&M Bank", popular: false },
+  { name: "Equity", popular: false },
+  { name: "Cash Deposit", popular: false },
+  { name: "ABSA", popular: false },
+  { name: "Access Bank", popular: false },
+  { name: "Chipper Cash", popular: false },
+];
 
 // ─── Page Title ──────────────────────────────────────────────────────
 const PageTitle = () => (
@@ -173,41 +197,301 @@ const ActionTabs = ({
   </div>
 );
 
+// ─── Dropdown Wrapper ────────────────────────────────────────────────
+const DropdownWrapper = ({ isOpen, onClose, children, className = "" }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    if (isOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen, onClose]);
+  if (!isOpen) return null;
+  return (
+    <div ref={ref} className={`absolute top-full mt-1 z-50 bg-card border border-border rounded-xl shadow-lg ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+// ─── Currency Dropdown ───────────────────────────────────────────────
+const CurrencyDropdown = ({ selected, onSelect }: { selected: string; onSelect: (code: string) => void }) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const filtered = fiats.filter(f => f.code.toLowerCase().includes(search.toLowerCase()));
+  const current = fiats.find(f => f.code === selected);
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 px-3 py-2 border-l border-border text-sm text-foreground">
+        <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[7px] font-bold" style={{ backgroundColor: current?.color || "#4CAF50" }}>
+          {selected.substring(0, 2)}
+        </div>
+        {selected}
+        {open ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+      </button>
+      <DropdownWrapper isOpen={open} onClose={() => setOpen(false)} className="w-56 right-0">
+        <div className="p-3 border-b border-border">
+          <div className="flex items-center gap-2 border border-border rounded-lg px-3 py-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search" className="bg-transparent outline-none text-sm text-foreground w-full placeholder:text-muted-foreground" />
+          </div>
+        </div>
+        <div className="max-h-64 overflow-y-auto py-1">
+          {filtered.map(f => (
+            <button
+              key={f.code}
+              onClick={() => { onSelect(f.code); setOpen(false); setSearch(""); }}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted/30 transition-colors ${f.code === selected ? "bg-primary/10 text-primary" : "text-foreground"}`}
+            >
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[7px] font-bold" style={{ backgroundColor: f.color }}>
+                {f.code.substring(0, 2)}
+              </div>
+              {f.code}
+            </button>
+          ))}
+        </div>
+      </DropdownWrapper>
+    </div>
+  );
+};
+
+// ─── Payment Methods Dropdown ────────────────────────────────────────
+const PaymentMethodsDropdown = () => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [allSelected, setAllSelected] = useState(true);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [showNotice, setShowNotice] = useState(true);
+  const filtered = paymentMethodsList.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  const popular = filtered.filter(p => p.popular);
+  const other = filtered.filter(p => !p.popular);
+
+  const displayLabel = allSelected ? "All Payment Methods" : selected.length > 0 ? `${selected.length} selected` : "All Payment Methods";
+
+  const toggleMethod = (name: string) => {
+    setAllSelected(false);
+    setSelected(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
+  };
+
+  const handleConfirm = () => setOpen(false);
+  const handleReset = () => { setAllSelected(true); setSelected([]); };
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-sm bg-card text-foreground rounded-lg px-3 py-2 border border-border cursor-pointer">
+        {displayLabel}
+        {open ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+      </button>
+      <DropdownWrapper isOpen={open} onClose={() => setOpen(false)} className="w-80">
+        <div className="p-3 border-b border-border">
+          <div className="flex items-center gap-2 border border-border rounded-lg px-3 py-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="" className="bg-transparent outline-none text-sm text-foreground w-full" />
+          </div>
+        </div>
+
+        {showNotice && (
+          <div className="mx-3 mt-3 p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs text-foreground/80 relative">
+            <button onClick={() => setShowNotice(false)} className="absolute top-2 right-2"><X className="h-3 w-3 text-muted-foreground" /></button>
+            <div className="flex gap-2">
+              <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <span>In accordance with compliance regulations, we've made updates to the names of payment methods on our platform. We kindly request that you check with the advertiser for information on the accepted payment methods before proceeding with any payments.</span>
+            </div>
+          </div>
+        )}
+
+        <div className="max-h-64 overflow-y-auto p-3 space-y-1">
+          {/* All Payment Methods toggle */}
+          <label className="flex items-center gap-3 py-2 cursor-pointer">
+            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${allSelected ? "bg-primary border-primary" : "border-border"}`}>
+              {allSelected && <span className="text-primary-foreground text-xs">✓</span>}
+            </div>
+            <span className="text-sm font-medium text-foreground">All Payment Methods</span>
+          </label>
+
+          <div className="border-t border-border my-2" />
+
+          {popular.length > 0 && (
+            <>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground py-1">
+                Popular <Flame className="h-3 w-3 text-primary" />
+              </div>
+              {popular.map(p => (
+                <label key={p.name} className={`flex items-center gap-3 py-2.5 px-1 cursor-pointer rounded-lg transition-colors ${selected.includes(p.name) ? "bg-primary/5" : ""}`}>
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${selected.includes(p.name) ? "bg-primary/20 border-primary" : "border-border"}`}>
+                    {selected.includes(p.name) && <span className="text-primary text-xs">✓</span>}
+                  </div>
+                  <span className="w-0.5 h-4 bg-primary rounded-full" />
+                  <span className="text-sm text-foreground">{p.name}</span>
+                </label>
+              ))}
+            </>
+          )}
+
+          {other.length > 0 && other.map(p => (
+            <label key={p.name} className={`flex items-center gap-3 py-2.5 px-1 cursor-pointer rounded-lg transition-colors ${selected.includes(p.name) ? "bg-primary/5" : ""}`}>
+              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${selected.includes(p.name) ? "bg-primary/20 border-primary" : "border-border"}`}>
+                {selected.includes(p.name) && <span className="text-primary text-xs">✓</span>}
+              </div>
+              <span className="w-0.5 h-4 bg-primary rounded-full" />
+              <span className="text-sm text-foreground">{p.name}</span>
+            </label>
+          ))}
+        </div>
+
+        <div className="flex gap-3 p-3 border-t border-border">
+          <button onClick={handleConfirm} className="flex-1 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">Confirm</button>
+          <button onClick={handleReset} className="flex-1 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">Reset</button>
+        </div>
+      </DropdownWrapper>
+    </div>
+  );
+};
+
+// ─── Refresh Settings Dropdown ───────────────────────────────────────
+const RefreshDropdown = () => {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState("Not now");
+  const options = ["Not now", "5s to refresh", "10s to refresh"];
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-sm text-foreground border border-border rounded-lg px-3 py-2 bg-card hover:bg-muted/30">
+        <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+        Refresh settin...
+        {open ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
+      </button>
+      <DropdownWrapper isOpen={open} onClose={() => setOpen(false)} className="w-48">
+        <div className="py-1">
+          {options.map(opt => (
+            <button
+              key={opt}
+              onClick={() => { setSelected(opt); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm hover:bg-muted/30 transition-colors ${opt === selected ? "text-primary font-medium" : "text-foreground"}`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </DropdownWrapper>
+    </div>
+  );
+};
+
+// ─── Filter Panel Dropdown ───────────────────────────────────────────
+const FilterDropdown = () => {
+  const [open, setOpen] = useState(false);
+  const [adTypes, setAdTypes] = useState({
+    verified: false,
+    blockAdvertisers: false,
+    eligible: false,
+    noVerification: false,
+  });
+  const [sortBy, setSortBy] = useState("Overall sorting");
+  const [timeLimit, setTimeLimit] = useState("All");
+
+  const sortOptions = ["Overall sorting", "Completed order number", "Completion Rate", "Price (lowest to highest)"];
+  const timeLimits = ["All", "15", "30"];
+
+  const handleReset = () => {
+    setAdTypes({ verified: false, blockAdvertisers: false, eligible: false, noVerification: false });
+    setSortBy("Overall sorting");
+    setTimeLimit("All");
+  };
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-sm text-foreground hover:text-primary">
+        Filter <Filter className="h-3.5 w-3.5" />
+      </button>
+      <DropdownWrapper isOpen={open} onClose={() => setOpen(false)} className="w-96 right-0">
+        <div className="p-4 space-y-5">
+          {/* Ad Types */}
+          <div>
+            <h4 className="text-sm text-muted-foreground mb-3">Ad Types</h4>
+            <div className="space-y-3">
+              {[
+                { key: "verified" as const, label: "Show only Verified Advertisers" },
+                { key: "blockAdvertisers" as const, label: "Show only Block Advertisers", icon: true },
+                { key: "eligible" as const, label: "Show only Eligible Ads" },
+                { key: "noVerification" as const, label: "Ads With No Verification Required" },
+              ].map(item => (
+                <label key={item.key} className="flex items-center gap-3 cursor-pointer">
+                  <div
+                    onClick={() => setAdTypes(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${adTypes[item.key] ? "bg-primary border-primary" : "border-border"}`}
+                  >
+                    {adTypes[item.key] && <span className="text-primary-foreground text-xs">✓</span>}
+                  </div>
+                  <span className="text-sm text-foreground flex items-center gap-1">
+                    {item.icon && <span className="text-primary">◆</span>}
+                    {item.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Sort By */}
+          <div>
+            <h4 className="text-sm text-muted-foreground mb-3">Sort By</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {sortOptions.map(opt => (
+                <button
+                  key={opt}
+                  onClick={() => setSortBy(opt)}
+                  className={`px-3 py-2.5 rounded-lg text-sm font-medium border transition-colors ${sortBy === opt ? "border-primary text-primary bg-primary/5" : "border-border text-foreground hover:bg-muted/30"}`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Payment Time Limit */}
+          <div>
+            <h4 className="text-sm text-muted-foreground mb-3">Payment Time Limit (minutes)</h4>
+            <div className="flex gap-2">
+              {timeLimits.map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTimeLimit(t)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${timeLimit === t ? "border-primary text-primary bg-primary/5" : "border-border text-foreground hover:bg-muted/30"}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 p-4 border-t border-border">
+          <button onClick={() => setOpen(false)} className="flex-1 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all">Confirm</button>
+          <button onClick={handleReset} className="flex-1 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">Reset</button>
+        </div>
+      </DropdownWrapper>
+    </div>
+  );
+};
+
 // ─── Filter Row ──────────────────────────────────────────────────────
-const FilterRow = () => (
+const FilterRow = ({ selectedFiat, setSelectedFiat }: { selectedFiat: string; setSelectedFiat: (f: string) => void }) => (
   <div className="px-4 pb-3 flex flex-wrap items-center gap-3">
-    {/* Amount input */}
-    <div className="flex items-center border border-border rounded-lg overflow-hidden bg-card">
+    {/* Amount input + Currency */}
+    <div className="flex items-center border border-border rounded-lg overflow-visible bg-card relative">
       <input
         type="text"
         placeholder="Enter Amount"
         className="px-3 py-2 text-sm bg-transparent outline-none w-32 text-foreground placeholder:text-muted-foreground"
       />
-      <div className="flex items-center gap-1.5 px-3 py-2 border-l border-border text-sm text-foreground">
-        <div className="w-4 h-4 rounded-full bg-success flex items-center justify-center text-white text-[8px] font-bold">K</div>
-        KES
-        <ChevronRight className="h-3 w-3 text-muted-foreground rotate-90" />
-      </div>
+      <CurrencyDropdown selected={selectedFiat} onSelect={setSelectedFiat} />
     </div>
 
-    {/* Payment Methods dropdown */}
-    <select className="text-sm bg-card text-foreground rounded-lg px-3 py-2 border border-border appearance-none pr-8 cursor-pointer">
-      {payments.map((p) => (
-        <option key={p}>{p}</option>
-      ))}
-    </select>
-
-    {/* Refresh settings */}
-    <button className="flex items-center gap-1.5 text-sm text-foreground border border-border rounded-lg px-3 py-2 bg-card hover:bg-muted/30">
-      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
-      Refresh settin...
-      <ChevronRight className="h-3 w-3 text-muted-foreground rotate-90" />
-    </button>
-
-    {/* Filter button */}
-    <button className="flex items-center gap-1.5 text-sm text-foreground hover:text-primary">
-      Filter <Filter className="h-3.5 w-3.5" />
-    </button>
+    <PaymentMethodsDropdown />
+    <RefreshDropdown />
+    <FilterDropdown />
   </div>
 );
 
@@ -478,6 +762,7 @@ const FAQs = () => {
 const P2PDashboard = () => {
   const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
   const [selectedCrypto, setSelectedCrypto] = useState("USDT");
+  const [selectedFiat, setSelectedFiat] = useState("KES");
 
   return (
     <div className="w-full px-4 md:px-8 lg:px-12 space-y-6 pb-12">
@@ -488,7 +773,7 @@ const P2PDashboard = () => {
       <PromoBanner />
 
       {/* 3. Main Trade Dashboard */}
-      <div className="bg-card rounded-xl shadow-sm border border-border/30 overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm border border-border/30">
         <AnnounceRibbon />
         <ActionTabs
           activeTab={activeTab}
@@ -496,7 +781,7 @@ const P2PDashboard = () => {
           selectedCrypto={selectedCrypto}
           setSelectedCrypto={setSelectedCrypto}
         />
-        <FilterRow />
+        <FilterRow selectedFiat={selectedFiat} setSelectedFiat={setSelectedFiat} />
         <MarqueeAnnouncement />
         <TradeTable activeTab={activeTab} selectedCrypto={selectedCrypto} />
       </div>
