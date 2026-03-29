@@ -3,8 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
-  { label: "One-Click Buy", href: "/one-click-buy" },
-  { label: "P2P", href: "/" },
+  { label: "Home", href: "/" },
+  { label: "Buy", href: "#", hasDropdown: true },
+  { label: "Sell", href: "#", hasDropdown: true },
+  { label: "Advertisements", href: "#" },
+  { label: "Trades", href: "#", hasDropdown: true },
+  { label: "Wallets", href: "#" },
+  { label: "Transactions", href: "#" },
+  { label: "Contact", href: "#" },
+  { label: "More", href: "#", hasDropdown: true },
+  { label: "Notifications", href: "#" },
 ];
 
 const Header = () => {
