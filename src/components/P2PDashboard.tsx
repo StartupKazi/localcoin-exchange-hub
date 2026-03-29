@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw } from "lucide-react";
 
 // ─── Data ────────────────────────────────────────────────────────────
