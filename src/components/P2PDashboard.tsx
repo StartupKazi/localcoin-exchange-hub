@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw, Search, X, Info, Flame, ChevronUp, ChevronDown } from "lucide-react";
+import { TradeDialog, RequirementsModal, KYCModal } from "./TradeModals";
 
 // ─── Data ────────────────────────────────────────────────────────────
 type TradeOffer = {
@@ -526,10 +527,38 @@ const TradeTable = ({
   selectedCrypto: string;
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOffer, setSelectedOffer] = useState<TradeOffer | null>(null);
+  const [showRequirements, setShowRequirements] = useState(false);
+  const [showKYC, setShowKYC] = useState(false);
   const totalPages = 5;
+
+  const handleAction = (offer: TradeOffer) => {
+    if (offer.eligible) {
+      setSelectedOffer(offer);
+    } else {
+      // Randomly show KYC or Requirements for demo purposes
+      if (Math.random() > 0.5) {
+        setShowKYC(true);
+      } else {
+        setShowRequirements(true);
+      }
+    }
+  };
 
   return (
     <div>
+      {/* Modals */}
+      {selectedOffer && (
+        <TradeDialog
+          offer={selectedOffer}
+          activeTab={activeTab}
+          selectedCrypto={selectedCrypto}
+          onClose={() => setSelectedOffer(null)}
+        />
+      )}
+      {showRequirements && <RequirementsModal onClose={() => setShowRequirements(false)} />}
+      {showKYC && <KYCModal onClose={() => setShowKYC(false)} />}
+
       {/* Table Header */}
       <div className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1.2fr] px-4 py-3 text-xs text-muted-foreground border-b border-border/30">
         <span>Advertiser</span>
@@ -595,11 +624,17 @@ const TradeTable = ({
             {/* Action */}
             <div className="text-right">
               {offer.eligible ? (
-                <button className="px-6 py-2.5 rounded-full bg-success text-white text-sm font-semibold hover:brightness-110 transition-all">
+                <button
+                  onClick={() => handleAction(offer)}
+                  className="px-6 py-2.5 rounded-full bg-success text-white text-sm font-semibold hover:brightness-110 transition-all"
+                >
                   {activeTab === "buy" ? "Buy" : "Sell"} {selectedCrypto}
                 </button>
               ) : (
-                <button className="px-6 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">
+                <button
+                  onClick={() => handleAction(offer)}
+                  className="px-6 py-2.5 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors"
+                >
                   ineligible
                 </button>
               )}
