@@ -37,8 +37,32 @@ const sellOffers: TradeOffer[] = [
 ];
 
 const cryptos = ["USDT", "BTC", "ETH", "USDC", "TRX", "BNB", "TRUMP 🔥", "SOL", "SUI"];
-const fiats = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
-const payments = ["All Payment Methods", "M-Pesa", "Bank Transfer", "Airtel Money", "Cash Deposit"];
+const fiats = [
+  { code: "AUD", color: "#4CAF50" },
+  { code: "IDR", color: "#E91E63" },
+  { code: "NGN", color: "#4CAF50" },
+  { code: "ARS", color: "#4CAF50" },
+  { code: "EUR", color: "#3F51B5" },
+  { code: "PKR", color: "#E91E63" },
+  { code: "GHS", color: "#FF9800" },
+  { code: "KES", color: "#4CAF50" },
+  { code: "USD", color: "#4CAF50" },
+  { code: "TZS", color: "#FF9800" },
+  { code: "UGX", color: "#E91E63" },
+];
+
+const paymentMethodsList = [
+  { name: "M-Pesa Kenya(Safaricom)", popular: true },
+  { name: "M-pesa Paybill", popular: true },
+  { name: "Bank Transfer", popular: true },
+  { name: "Airtel Money", popular: false },
+  { name: "I&M Bank", popular: false },
+  { name: "Equity", popular: false },
+  { name: "Cash Deposit", popular: false },
+  { name: "ABSA", popular: false },
+  { name: "Access Bank", popular: false },
+  { name: "Chipper Cash", popular: false },
+];
 
 // ─── Page Title ──────────────────────────────────────────────────────
 const PageTitle = () => (
