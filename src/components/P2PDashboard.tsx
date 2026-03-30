@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw, Search, X, Info, Flame, ChevronUp, ChevronDown } from "lucide-react";
 import { TradeDialog, RequirementsModal, KYCModal } from "./TradeModals";
 
