@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Shield, Clock, ChevronRight, ChevronLeft, Filter, Volume2, RefreshCw, Search, X, Info, Flame, ChevronUp, ChevronDown } from "lucide-react";
 import { TradeDialog, RequirementsModal, KYCModal } from "./TradeModals";
 
@@ -150,7 +151,9 @@ const ActionTabs = ({
   setActiveTab: (t: "buy" | "sell") => void;
   selectedCrypto: string;
   setSelectedCrypto: (c: string) => void;
-}) => (
+}) => {
+  const navigate = useNavigate();
+  return (
   <div className="px-4 pt-4 pb-3 flex flex-wrap items-center gap-4">
     {/* Buy / Sell pill buttons */}
     <div className="flex rounded-full border border-border overflow-hidden">
@@ -191,12 +194,13 @@ const ActionTabs = ({
           {c}
         </button>
       ))}
-      <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-0.5 ml-1">
+      <button onClick={() => navigate("/one-click-buy")} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-0.5 ml-1">
         Supports 300+ Cryptos <ChevronRight className="h-3.5 w-3.5" />
       </button>
     </div>
   </div>
-);
+  );
+};
 
 // ─── Dropdown Wrapper ────────────────────────────────────────────────
 const DropdownWrapper = ({ isOpen, onClose, children, className = "" }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; className?: string }) => {
