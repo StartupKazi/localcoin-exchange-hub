@@ -25,18 +25,9 @@ const OneClickBuy = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main className="flex-1 pt-24 pb-16">
-        <div className="w-full px-4 md:px-8 lg:px-12">
-          {/* Sub-navigation */}
-          <div className="flex items-center gap-6 border-b border-border/40 mb-8">
-            <a href="/one-click-buy" className="text-sm font-semibold text-primary border-b-2 border-primary pb-3">
-              One-Click Buy
-            </a>
-            <a href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground pb-3 transition-colors">
-              P2P
-            </a>
-          </div>
-
+      <main className="flex-1 pt-16">
+        <TradeNav />
+        <div className="w-full px-4 md:px-8 lg:px-12 py-8">
           {/* Main content */}
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Left side – title + promo */}
