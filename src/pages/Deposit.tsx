@@ -46,7 +46,7 @@ const Deposit = () => {
           >
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowPaymentMethod(false)} />
             <div
-              className={`absolute top-0 right-0 h-full w-full max-w-md bg-card border-l border-border/30 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+              className={`absolute top-0 right-0 h-full w-full sm:max-w-md bg-card border-l border-border/30 shadow-2xl transform transition-transform duration-300 ease-in-out ${
                 showPaymentMethod ? "translate-x-0" : "translate-x-full"
               }`}
             >
