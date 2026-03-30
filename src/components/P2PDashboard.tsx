@@ -151,7 +151,9 @@ const ActionTabs = ({
   setActiveTab: (t: "buy" | "sell") => void;
   selectedCrypto: string;
   setSelectedCrypto: (c: string) => void;
-}) => (
+}) => {
+  const navigate = useNavigate();
+  return (
   <div className="px-4 pt-4 pb-3 flex flex-wrap items-center gap-4">
     {/* Buy / Sell pill buttons */}
     <div className="flex rounded-full border border-border overflow-hidden">
