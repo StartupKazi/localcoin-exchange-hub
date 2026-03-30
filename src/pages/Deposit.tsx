@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronDown, ArrowRight, Wallet, DollarSign, Rocket, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
