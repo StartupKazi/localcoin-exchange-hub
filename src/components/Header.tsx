@@ -145,12 +145,27 @@ const Header = () => {
                   </div>
                   <p className="text-xs text-white/40 mt-2">*Data may be delayed.</p>
                   <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={() => { navigate("/deposit"); setAssetsOpen(false); }}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
-                    >
-                      <Download className="h-4 w-4" /> Deposit
-                    </button>
+                    <div className="flex-1 relative group">
+                      <button
+                        className="w-full flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
+                      >
+                        <Download className="h-4 w-4" /> Deposit <ChevronDown className="h-3 w-3" />
+                      </button>
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-[hsl(var(--nav-bg))] border border-border/20 rounded-lg shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <button
+                          onClick={() => { navigate("/deposit"); setAssetsOpen(false); }}
+                          className="w-full text-left px-3 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                        >
+                          Fiat Deposit
+                        </button>
+                        <button
+                          onClick={() => { navigate("/"); setAssetsOpen(false); }}
+                          className="w-full text-left px-3 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
+                        >
+                          P2P Deposit
+                        </button>
+                      </div>
+                    </div>
                     <button
                       onClick={() => { navigate("/withdraw"); setAssetsOpen(false); }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
