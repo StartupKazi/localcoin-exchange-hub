@@ -148,7 +148,7 @@ const Deposit = () => {
                     </button>
 
                     <button
-                      onClick={() => setShowPaymentMethod(false)}
+                      onClick={() => { setShowPaymentMethod(false); navigate("/one-click-buy"); }}
                       className="w-full flex items-center gap-4 p-4 border border-border/30 rounded-xl hover:bg-muted/10 transition-colors"
                     >
                       <span className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
