@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TradeNav from "@/components/TradeNav";
 
 const cryptoOptions = ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "TRX"];
 const fiatOptions = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
