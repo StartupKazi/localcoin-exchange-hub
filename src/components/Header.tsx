@@ -18,6 +18,8 @@ const navLinks = [
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -32,36 +34,40 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
-        <a href="#" className="flex-shrink-0">
+        <button onClick={() => navigate("/")} className="flex-shrink-0">
           <img src={logo} alt="LocalCoin Trade" className="h-10" />
-        </a>
+        </button>
 
         <nav className="hidden lg:flex items-center gap-6">
           {navLinks.map((link) => (
-            <a
+            <button
               key={link.label}
-              href={link.href}
-              className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
+              onClick={() => navigate(link.href)}
+              className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                location.pathname === link.href
+                  ? "text-primary"
+                  : "text-white/90 hover:text-primary"
+              }`}
             >
               {link.label}
               {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
-            </a>
+            </button>
           ))}
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <a
-            href="#"
+          <button
+            onClick={() => navigate("/")}
             className="px-5 py-2 text-sm font-semibold rounded bg-primary text-primary-foreground hover:brightness-110 transition"
           >
             Dashboard
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            onClick={() => navigate("/")}
             className="px-5 py-2 text-sm font-semibold rounded bg-primary text-primary-foreground hover:brightness-110 transition"
           >
             Logout
-          </a>
+          </button>
         </div>
       </div>
     </header>
