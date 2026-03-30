@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronDown, ArrowRight, Wallet, DollarSign, Rocket, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -15,6 +16,7 @@ const currencies = [
 ];
 
 const Deposit = () => {
+  const navigate = useNavigate();
   const [selectedCurrency, setSelectedCurrency] = useState("KES");
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [currencySearch, setCurrencySearch] = useState("");
@@ -120,7 +122,7 @@ const Deposit = () => {
 
                   <div className="space-y-3">
                     <button
-                      onClick={() => setShowPaymentMethod(false)}
+                      onClick={() => { setShowPaymentMethod(false); navigate("/"); }}
                       className="w-full flex items-center gap-4 p-4 border border-border/30 rounded-xl hover:bg-muted/10 transition-colors"
                     >
                       <span className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -146,7 +148,7 @@ const Deposit = () => {
                     </button>
 
                     <button
-                      onClick={() => setShowPaymentMethod(false)}
+                      onClick={() => { setShowPaymentMethod(false); navigate("/one-click-buy"); }}
                       className="w-full flex items-center gap-4 p-4 border border-border/30 rounded-xl hover:bg-muted/10 transition-colors"
                     >
                       <span className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
