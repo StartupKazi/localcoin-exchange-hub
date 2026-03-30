@@ -38,11 +38,21 @@ const Deposit = () => {
 
         <div className="container mx-auto px-4 py-10">
           {/* Payment method selector modal */}
-          {showPaymentMethod && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-              <div className="bg-sidebar-background text-sidebar-foreground rounded-2xl w-full max-w-md p-6 space-y-5">
+          {/* Right-side sliding panel */}
+          <div
+            className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+              showPaymentMethod ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowPaymentMethod(false)} />
+            <div
+              className={`absolute top-0 right-0 h-full w-full max-w-md bg-card border-l border-border/30 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+                showPaymentMethod ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              <div className="p-6 space-y-6 h-full overflow-y-auto">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold">Select Payment Method</h2>
+                  <h2 className="text-xl font-bold text-foreground">Select Payment Method</h2>
                   <button
                     onClick={() => setShowPaymentMethod(false)}
                     className="text-muted-foreground hover:text-foreground text-xl"
@@ -59,7 +69,7 @@ const Deposit = () => {
                       <Wallet className="h-5 w-5 text-primary" />
                     </span>
                     <div className="text-left">
-                      <p className="font-semibold">Deposit Crypto</p>
+                      <p className="font-semibold text-foreground">Deposit Crypto</p>
                       <p className="text-sm text-muted-foreground">Already have crypto? Deposit directly</p>
                     </div>
                   </button>
@@ -82,7 +92,7 @@ const Deposit = () => {
                       </button>
 
                       {showCurrencyPicker && (
-                        <div className="absolute right-0 top-10 bg-sidebar-background border border-border/30 rounded-xl shadow-xl z-10 w-64 max-h-72 overflow-hidden">
+                        <div className="absolute right-0 top-10 bg-card border border-border/30 rounded-xl shadow-xl z-10 w-64 max-h-72 overflow-hidden">
                           <div className="p-3 border-b border-border/20">
                             <div className="flex items-center gap-2 bg-muted/10 rounded-lg px-3 py-2">
                               <Search className="h-4 w-4 text-muted-foreground" />
@@ -129,21 +139,8 @@ const Deposit = () => {
                         <span className="text-primary font-bold text-sm">P2P</span>
                       </span>
                       <div className="text-left">
-                        <p className="font-semibold">P2P Trading</p>
+                        <p className="font-semibold text-foreground">P2P Trading</p>
                         <p className="text-sm text-muted-foreground">More Choices, Better Prices</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setShowPaymentMethod(false)}
-                      className="w-full flex items-center gap-4 p-4 border border-border/30 rounded-xl hover:bg-muted/10 transition-colors"
-                    >
-                      <span className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <DollarSign className="h-5 w-5 text-primary" />
-                      </span>
-                      <div className="text-left">
-                        <p className="font-semibold">Deposit {selectedCurrency}</p>
-                        <p className="text-sm text-muted-foreground">Deposit via Bank Transfers or Top-Ups</p>
                       </div>
                     </button>
 
@@ -155,7 +152,7 @@ const Deposit = () => {
                         <Rocket className="h-5 w-5 text-primary" />
                       </span>
                       <div className="text-left">
-                        <p className="font-semibold">Buy with {selectedCurrency}</p>
+                        <p className="font-semibold text-foreground">Buy with {selectedCurrency}</p>
                         <p className="text-sm text-muted-foreground">Visa, Mastercard and JCB are supported</p>
                       </div>
                     </button>
@@ -163,7 +160,7 @@ const Deposit = () => {
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Left side */}
