@@ -16,6 +16,7 @@ const currencies = [
 ];
 
 const Deposit = () => {
+  const navigate = useNavigate();
   const [selectedCurrency, setSelectedCurrency] = useState("KES");
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [currencySearch, setCurrencySearch] = useState("");
