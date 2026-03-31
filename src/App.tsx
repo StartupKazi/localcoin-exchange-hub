@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import OneClickBuy from "./pages/OneClickBuy.tsx";
 import Deposit from "./pages/Deposit.tsx";
 import Withdraw from "./pages/Withdraw.tsx";
+import MyAds from "./pages/MyAds.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
