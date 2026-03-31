@@ -11,7 +11,7 @@ const leftLinks = [
 
 const rightLinks = [
   { label: "User Guide", href: "#", hasDropdown: true },
-  { label: "Ads", href: "#", hasDropdown: true },
+  { label: "Ads", href: "/my-ads", hasDropdown: true },
   { label: "Orders", href: "#" },
   { label: "P2P User Center", href: "#" },
 ];
