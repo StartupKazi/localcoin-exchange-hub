@@ -3,6 +3,7 @@ import { AlertCircle, Mail, Shield, CheckCircle, XCircle, Clock, Copy, AlertTria
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TradeNav from "@/components/TradeNav";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
