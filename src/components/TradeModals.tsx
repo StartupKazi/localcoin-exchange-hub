@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Shield, CheckCircle, AlertCircle, FileText, Smartphone, ChevronRight, ChevronDown, Copy, Send, Plus, AlertTriangle } from "lucide-react";
+import { X, Shield, CheckCircle, AlertCircle, FileText, Smartphone, ChevronRight, ChevronDown, Copy, Send, Plus, AlertTriangle, PartyPopper, Lock, Flag, Clock, ArrowRight } from "lucide-react";
 
 type TradeOffer = {
   id: number;
