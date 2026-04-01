@@ -425,7 +425,228 @@ export const TradeDialog = ({
   );
 };
 
+// ─── Trade Success Screen ────────────────────────────────────────────
+const TradeSuccessScreen = ({
+  offer,
+  activeTab,
+  selectedCrypto,
+  quantity,
+  payAmount,
+  onClose,
+}: {
+  offer: TradeOffer;
+  activeTab: "buy" | "sell";
+  selectedCrypto: string;
+  quantity: string;
+  payAmount: string;
+  onClose: () => void;
+}) => {
+  const isBuy = activeTab === "buy";
+  return (
+    <div className="fixed inset-0 z-[90] bg-background overflow-y-auto">
+      <div className="max-w-xl mx-auto px-6 py-16 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-success/10 flex items-center justify-center">
+          <PartyPopper className="h-10 w-10 text-success" />
+        </div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Transaction Completed!</h1>
+        <p className="text-muted-foreground mb-8">
+          Your P2P {isBuy ? "purchase" : "sale"} has been successfully completed.
+        </p>
+
+        {/* Coin Transfer Summary */}
+        <div className="bg-card rounded-2xl border border-border/30 p-6 mb-6 text-left">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Transfer Summary</h3>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex-1 text-center">
+              <p className="text-xs text-muted-foreground mb-1">{isBuy ? "You Paid" : "You Sold"}</p>
+              <p className="text-xl font-bold text-foreground">
+                {isBuy ? `${payAmount} ${offer.currency}` : `${quantity} ${selectedCrypto}`}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mx-4">
+              <ArrowRight className="h-5 w-5 text-success" />
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-xs text-muted-foreground mb-1">{isBuy ? "You Received" : "You Received"}</p>
+              <p className="text-xl font-bold text-success">
+                {isBuy ? `${quantity} ${selectedCrypto}` : `${payAmount} ${offer.currency}`}
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t border-border/30 pt-4 space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Merchant</span>
+              <span className="font-medium text-foreground flex items-center gap-1">{offer.merchant} <Shield className="h-3 w-3 text-primary" /></span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Price</span>
+              <span className="font-medium text-foreground">{offer.price} {offer.currency}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Payment Method</span>
+              <span className="font-medium text-foreground">{offer.paymentMethods[0]}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Status</span>
+              <span className="font-medium text-success flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Completed</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Coin credited notice */}
+        <div className="bg-success/5 border border-success/20 rounded-xl p-4 mb-8 flex items-start gap-3 text-left">
+          <CheckCircle className="h-5 w-5 text-success shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-foreground mb-0.5">
+              {isBuy ? `${quantity} ${selectedCrypto} has been credited to your Spot Wallet` : `${payAmount} ${offer.currency} has been transferred to your account`}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              The funds are now available for trading, withdrawal, or conversion.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={onClose}
+            className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
+          >
+            Back to P2P
+          </button>
+          <button
+            onClick={onClose}
+            className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors"
+          >
+            View Orders
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Dispute Modal ───────────────────────────────────────────────────
+const DisputeModal = ({
+  offer,
+  orderId,
+  onClose,
+  onSubmit,
+}: {
+  offer: TradeOffer;
+  orderId: string;
+  onClose: () => void;
+  onSubmit: () => void;
+}) => {
+  const [reason, setReason] = useState("");
+  const [details, setDetails] = useState("");
+  const reasons = [
+    "I have paid but the seller has not released the coins",
+    "The seller is unresponsive",
+    "The payment details provided are incorrect",
+    "I suspect fraudulent activity",
+    "Other",
+  ];
+
+  return (
+    <Overlay onClose={onClose}>
+      <div className="w-[520px] p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Flag className="h-5 w-5 text-destructive" /> File a Dispute
+          </h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-xs text-foreground mb-5 flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+          <span>Filing a dispute will freeze the escrowed funds until a resolution is reached. Please provide accurate information to help us resolve the issue quickly.</span>
+        </div>
+
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground mb-1">Order ID</p>
+          <p className="text-sm font-mono text-foreground">{orderId.slice(0, 19)}</p>
+        </div>
+
+        <div className="mb-4">
+          <p className="text-sm font-medium text-foreground mb-3">Select a reason for the dispute:</p>
+          <div className="space-y-2 border border-border rounded-xl p-3">
+            {reasons.map(r => (
+              <label key={r} className="flex items-start gap-3 cursor-pointer py-1.5">
+                <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${reason === r ? "border-primary" : "border-border"}`}>
+                  {reason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <span className="text-sm text-foreground">{r}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <label className="text-sm font-medium text-foreground mb-2 block">Additional Details</label>
+          <textarea
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            placeholder="Describe the issue in detail..."
+            className="w-full border border-border rounded-xl p-3 text-sm text-foreground bg-transparent outline-none resize-none h-24 placeholder:text-muted-foreground focus:border-primary"
+          />
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onSubmit}
+            disabled={!reason}
+            className="flex-1 py-3 rounded-full bg-destructive text-white text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Submit Dispute
+          </button>
+          <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Overlay>
+  );
+};
+
+// ─── Escrow Status Banner ────────────────────────────────────────────
+const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" | "releasing" | "disputed"; selectedCrypto: string; quantity: string }) => {
+  const configs = {
+    locked: {
+      icon: <Lock className="h-4 w-4 text-primary" />,
+      bg: "bg-primary/5 border-primary/20",
+      title: "Escrow: Funds Locked",
+      desc: `${quantity} ${selectedCrypto} is securely held in escrow until the trade is completed.`,
+    },
+    releasing: {
+      icon: <Clock className="h-4 w-4 text-warning" />,
+      bg: "bg-warning/5 border-warning/20",
+      title: "Escrow: Releasing Funds",
+      desc: `${quantity} ${selectedCrypto} is being released to your wallet. This may take a few moments.`,
+    },
+    disputed: {
+      icon: <Flag className="h-4 w-4 text-destructive" />,
+      bg: "bg-destructive/5 border-destructive/20",
+      title: "Escrow: Dispute in Progress",
+      desc: `${quantity} ${selectedCrypto} is frozen in escrow. A moderator will review and resolve this dispute.`,
+    },
+  };
+  const c = configs[status];
+
+  return (
+    <div className={`border rounded-xl p-4 mb-6 flex items-start gap-3 ${c.bg}`}>
+      <div className="w-8 h-8 rounded-full bg-background/50 flex items-center justify-center shrink-0">{c.icon}</div>
+      <div>
+        <p className="text-sm font-semibold text-foreground">{c.title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{c.desc}</p>
+      </div>
+    </div>
+  );
+};
+
 // ─── Order Page (full-page, replaces dashboard) ─────────────────────
+type OrderStep = "pending_payment" | "coin_release" | "success" | "disputed";
+
 const OrderPage = ({
   offer,
   activeTab,
@@ -439,8 +660,10 @@ const OrderPage = ({
   payAmount: string;
   onClose: () => void;
 }) => {
+  const [orderStep, setOrderStep] = useState<OrderStep>("pending_payment");
   const [showConfirmPayment, setShowConfirmPayment] = useState(false);
   const [showCancelOrder, setShowCancelOrder] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [minutes, setMinutes] = useState(14);
   const [seconds, setSeconds] = useState(59);
@@ -453,6 +676,7 @@ const OrderPage = ({
   const orderId = `2038${Date.now()}`;
 
   useEffect(() => {
+    if (orderStep !== "pending_payment") return;
     const timer = setInterval(() => {
       setSeconds(s => {
         if (s === 0) {
@@ -463,23 +687,64 @@ const OrderPage = ({
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [orderStep]);
+
+  // Auto-transition from coin_release to success
+  useEffect(() => {
+    if (orderStep === "coin_release") {
+      const t = setTimeout(() => setOrderStep("success"), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [orderStep]);
+
+  const handlePaymentConfirmed = () => {
+    setShowConfirmPayment(false);
+    setOrderStep("coin_release");
+  };
+
+  const handleDisputeSubmit = () => {
+    setShowDispute(false);
+    setOrderStep("disputed");
+  };
+
+  // Show success screen
+  if (orderStep === "success") {
+    return (
+      <TradeSuccessScreen
+        offer={offer}
+        activeTab={activeTab}
+        selectedCrypto={selectedCrypto}
+        quantity={quantity}
+        payAmount={pay.toFixed(2)}
+        onClose={onClose}
+      />
+    );
+  }
+
+  const stepIndex = orderStep === "pending_payment" ? 1 : orderStep === "coin_release" ? 2 : orderStep === "disputed" ? 2 : 3;
 
   return (
     <div className="fixed inset-0 z-[90] bg-background overflow-y-auto">
-      {/* Modals rendered as overlays on top of order page */}
       {showConfirmPayment && (
         <ConfirmPaymentModal
           offer={offer}
           payAmount={pay.toFixed(2)}
           onClose={() => setShowConfirmPayment(false)}
-          onConfirm={() => { setShowConfirmPayment(false); onClose(); }}
+          onConfirm={handlePaymentConfirmed}
         />
       )}
       {showCancelOrder && (
         <CancelOrderModal
           onClose={() => setShowCancelOrder(false)}
           onConfirm={() => { setShowCancelOrder(false); onClose(); }}
+        />
+      )}
+      {showDispute && (
+        <DisputeModal
+          offer={offer}
+          orderId={orderId}
+          onClose={() => setShowDispute(false)}
+          onSubmit={handleDisputeSubmit}
         />
       )}
       <div className="max-w-7xl mx-auto px-6 py-6">
@@ -495,43 +760,85 @@ const OrderPage = ({
         <div className="flex gap-6">
           {/* Left – Order Details */}
           <div className="flex-1">
-            {/* Timer Card */}
-            <div className="bg-card rounded-xl border border-border/30 p-6 mb-6">
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">⏱</span>
-                  <h3 className="text-lg font-semibold text-foreground">Complete Your Payment Within:</h3>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(minutes).padStart(2, "0")}</span>
-                  <span className="text-xl font-bold text-foreground">:</span>
-                  <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(seconds).padStart(2, "0")}</span>
-                </div>
-              </div>
+            {/* Escrow Banner */}
+            <EscrowBanner
+              status={orderStep === "disputed" ? "disputed" : orderStep === "coin_release" ? "releasing" : "locked"}
+              selectedCrypto={selectedCrypto}
+              quantity={quantity}
+            />
 
-              <ul className="text-sm text-muted-foreground space-y-2 mb-6 list-disc pl-5">
-                <li>Please complete payment within the allowed timeframe.</li>
-                <li>After making the payment using a payment method outside of LocalCoin Trade, please click on the "I have completed the payment" button below.</li>
-                <li>Note: The order will be automatically canceled if the button is not clicked by the deadline.</li>
-              </ul>
+            {/* Timer / Status Card */}
+            <div className="bg-card rounded-xl border border-border/30 p-6 mb-6">
+              {orderStep === "pending_payment" && (
+                <>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">⏱</span>
+                      <h3 className="text-lg font-semibold text-foreground">Complete Your Payment Within:</h3>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(minutes).padStart(2, "0")}</span>
+                      <span className="text-xl font-bold text-foreground">:</span>
+                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(seconds).padStart(2, "0")}</span>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-2 mb-6 list-disc pl-5">
+                    <li>Please complete payment within the allowed timeframe.</li>
+                    <li>After making the payment, click "Payment Completed" below.</li>
+                    <li>The order will be automatically canceled if not confirmed by the deadline.</li>
+                  </ul>
+                </>
+              )}
+
+              {orderStep === "coin_release" && (
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Coin Release in Progress</h3>
+                  <p className="text-sm text-muted-foreground">Payment confirmed. The seller is releasing {quantity} {selectedCrypto} to your wallet...</p>
+                </div>
+              )}
+
+              {orderStep === "disputed" && (
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
+                    <Flag className="h-6 w-6 text-destructive" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Dispute Under Review</h3>
+                  <p className="text-sm text-muted-foreground mb-3">A moderator has been assigned to review this dispute. The escrowed funds remain frozen until resolution.</p>
+                  <div className="inline-flex items-center gap-2 bg-destructive/5 border border-destructive/20 rounded-full px-4 py-2 text-xs text-foreground">
+                    <Clock className="h-3.5 w-3.5 text-destructive" />
+                    Estimated resolution: 24–48 hours
+                  </div>
+                </div>
+              )}
 
               {/* 3-step progress */}
-              <div className="flex items-center bg-muted/10 rounded-xl p-4">
+              <div className="flex items-center bg-muted/10 rounded-xl p-4 mt-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">1</span>
-                  <span className="text-sm font-medium text-foreground">Complete Your Payment</span>
+                  <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${stepIndex >= 1 ? "bg-success text-white" : "bg-muted text-muted-foreground"}`}>
+                    {stepIndex > 1 ? "✓" : "1"}
+                  </span>
+                  <span className={`text-sm font-medium ${stepIndex >= 1 ? "text-foreground" : "text-muted-foreground"}`}>Complete Your Payment</span>
                 </div>
                 <div className="flex-1 mx-4 h-px bg-border relative">
-                  <div className="absolute left-0 top-0 h-px bg-success w-0" />
+                  <div className={`absolute left-0 top-0 h-px bg-success transition-all ${stepIndex >= 2 ? "w-full" : "w-0"}`} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-muted text-muted-foreground text-xs font-bold flex items-center justify-center">2</span>
-                  <span className="text-sm text-muted-foreground">Coin Release in Progress</span>
+                  <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${stepIndex >= 2 ? (orderStep === "disputed" ? "bg-destructive text-white" : "bg-success text-white") : "bg-muted text-muted-foreground"}`}>
+                    {orderStep === "disputed" ? "!" : stepIndex > 2 ? "✓" : "2"}
+                  </span>
+                  <span className={`text-sm ${stepIndex >= 2 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+                    {orderStep === "disputed" ? "Dispute Filed" : "Coin Release in Progress"}
+                  </span>
                 </div>
-                <div className="flex-1 mx-4 h-px bg-border" />
+                <div className="flex-1 mx-4 h-px bg-border relative">
+                  <div className={`absolute left-0 top-0 h-px bg-success transition-all ${stepIndex >= 3 ? "w-full" : "w-0"}`} />
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-muted text-muted-foreground text-xs font-bold flex items-center justify-center">3</span>
-                  <span className="text-sm text-muted-foreground">Transaction Completed</span>
+                  <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${stepIndex >= 3 ? "bg-success text-white" : "bg-muted text-muted-foreground"}`}>3</span>
+                  <span className={`text-sm ${stepIndex >= 3 ? "text-foreground" : "text-muted-foreground"}`}>Transaction Completed</span>
                 </div>
               </div>
             </div>
@@ -558,55 +865,77 @@ const OrderPage = ({
             </div>
 
             {/* Payment Methods */}
-            <div className="mb-6">
-              <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Payment Methods Accepted by the Seller
-              </h4>
-              <p className="text-xs text-muted-foreground mb-3">
-                Please select a payment method and visit the site of the bank or the payment service of your choosing to complete the payment.
-              </p>
-              <div className="space-y-3">
-                {offer.paymentMethods.map(pm => (
-                  <div key={pm} className="border border-border rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-success" />
-                      <span className="text-sm font-medium text-foreground">{pm}</span>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Name</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-foreground">RACHAEL MUUSI KILONZI</span>
-                          <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+            {orderStep === "pending_payment" && (
+              <div className="mb-6">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Payment Methods Accepted by the Seller
+                </h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Please select a payment method and visit the site of the bank or the payment service of your choosing to complete the payment.
+                </p>
+                <div className="space-y-3">
+                  {offer.paymentMethods.map(pm => (
+                    <div key={pm} className="border border-border rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="w-2.5 h-2.5 rounded-full bg-success" />
+                        <span className="text-sm font-medium text-foreground">{pm}</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Name</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-foreground">RACHAEL MUUSI KILONZI</span>
+                            <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Payment Details</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-foreground">0759810845</span>
+                            <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </div>
                         </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Payment Details</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-foreground">0759810845</span>
-                          <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Sticky Actions */}
             <div className="flex gap-3 sticky bottom-0 bg-background py-4">
-              <button
-                onClick={() => setShowConfirmPayment(true)}
-                className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
-              >
-                Payment Completed
-              </button>
-              <button
-                onClick={() => setShowCancelOrder(true)}
-                className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors flex items-center gap-1"
-              >
-                Cancel Order <AlertCircle className="h-3.5 w-3.5" />
-              </button>
+              {orderStep === "pending_payment" && (
+                <>
+                  <button
+                    onClick={() => setShowConfirmPayment(true)}
+                    className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
+                  >
+                    Payment Completed
+                  </button>
+                  <button
+                    onClick={() => setShowCancelOrder(true)}
+                    className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors flex items-center gap-1"
+                  >
+                    Cancel Order <AlertCircle className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              )}
+              {(orderStep === "pending_payment" || orderStep === "coin_release") && (
+                <button
+                  onClick={() => setShowDispute(true)}
+                  className="px-6 py-3 rounded-full border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/5 transition-colors flex items-center gap-1.5"
+                >
+                  <Flag className="h-3.5 w-3.5" /> Report / Dispute
+                </button>
+              )}
+              {orderStep === "disputed" && (
+                <button
+                  onClick={onClose}
+                  className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors"
+                >
+                  Back to P2P
+                </button>
+              )}
             </div>
           </div>
 
@@ -633,7 +962,9 @@ const OrderPage = ({
                 <div className="text-right">
                   <span className="text-xs text-muted-foreground">RACHAEL MUUSI KILONZI</span>
                   <div className="mt-1">
-                    <span className="text-xs text-destructive cursor-pointer hover:underline">Report User</span>
+                    <button onClick={() => setShowDispute(true)} className="text-xs text-destructive cursor-pointer hover:underline flex items-center gap-1 ml-auto">
+                      <Flag className="h-3 w-3" /> Report User
+                    </button>
                   </div>
                 </div>
               </div>
@@ -642,7 +973,6 @@ const OrderPage = ({
             {/* Chat Panel */}
             <div className="bg-card rounded-xl border border-border/30 flex flex-col" style={{ height: "calc(100vh - 280px)" }}>
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* System messages */}
                 <div className="bg-success/10 border border-success/20 rounded-lg p-3 space-y-2">
                   <p className="text-xs text-foreground flex items-start gap-1.5">
                     <CheckCircle className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
@@ -654,9 +984,19 @@ const OrderPage = ({
                   </p>
                 </div>
 
+                {orderStep === "disputed" && (
+                  <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 space-y-2">
+                    <p className="text-xs text-foreground flex items-start gap-1.5">
+                      <Flag className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />
+                      <strong>A dispute has been filed for this order.</strong>
+                    </p>
+                    <p className="text-xs text-muted-foreground">A moderator will review both parties' evidence. Please provide any relevant screenshots or transaction proof in the chat.</p>
+                  </div>
+                )}
+
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                   <p className="text-xs text-primary leading-relaxed">
-                    communicate outside the LocalCoin Trade. Please verify the information carefully. Stay vigilant, be aware of scams! <span className="font-medium underline cursor-pointer">Read More</span>
+                    Do not communicate outside LocalCoin Trade. Please verify the information carefully. Stay vigilant, be aware of scams! <span className="font-medium underline cursor-pointer">Read More</span>
                   </p>
                 </div>
 
@@ -665,11 +1005,10 @@ const OrderPage = ({
                 <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
                   <p className="text-xs text-foreground flex items-start gap-1.5">
                     <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />
-                    It is strongly recommended that you do not release the coins if the other party requests payment through a third-party account instead of an account under their real name. In such situations, we advise you to refund the payment and cancel the order.
+                    It is strongly recommended that you do not release the coins if the other party requests payment through a third-party account.
                   </p>
                 </div>
 
-                {/* Seller message */}
                 <div className="flex items-start gap-2">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-bold text-xs shrink-0">
                     {offer.merchant[0]}
@@ -683,7 +1022,6 @@ const OrderPage = ({
                   </div>
                 </div>
 
-                {/* Bot suggestion */}
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-lg shrink-0">🤖</div>
                   <div className="flex-1 bg-primary/5 border border-primary/20 rounded-full px-4 py-2 flex items-center justify-between">
@@ -693,7 +1031,6 @@ const OrderPage = ({
                 </div>
               </div>
 
-              {/* Chat Input */}
               <div className="border-t border-border p-3 flex items-center gap-2">
                 <input
                   type="text"
