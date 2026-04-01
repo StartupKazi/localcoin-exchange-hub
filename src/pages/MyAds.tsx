@@ -218,6 +218,7 @@ const MyAds = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Unable to Post Ads Modal */}
       <Dialog open={showPostAdModal} onOpenChange={setShowPostAdModal}>
