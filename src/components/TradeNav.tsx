@@ -12,6 +12,7 @@ const leftLinks = [
 const rightLinks = [
   { label: "Ads", href: "/my-ads" },
   { label: "Orders", href: "/orders" },
+  { label: "Disputes", href: "/disputes" },
 ];
 
 const TradeNav = () => {

@@ -218,6 +218,7 @@ const Convert = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Confirm */}
       <Dialog open={convertStep === "confirm"} onOpenChange={() => setConvertStep("idle")}>

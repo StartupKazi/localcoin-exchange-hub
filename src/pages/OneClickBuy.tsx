@@ -288,6 +288,7 @@ const OneClickBuy = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Order Confirmation Modal */}
       <Dialog open={orderStep === "confirm"} onOpenChange={() => setOrderStep("idle")}>

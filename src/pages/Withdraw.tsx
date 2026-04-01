@@ -216,6 +216,7 @@ const Withdraw = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Confirm Withdrawal */}
       <Dialog open={withdrawStep === "confirm"} onOpenChange={() => setWithdrawStep("form")}>

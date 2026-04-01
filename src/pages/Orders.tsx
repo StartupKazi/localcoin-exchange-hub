@@ -214,6 +214,7 @@ const Orders = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Order Detail Modal */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>

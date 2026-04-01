@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import TradeNav from "@/components/TradeNav";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";

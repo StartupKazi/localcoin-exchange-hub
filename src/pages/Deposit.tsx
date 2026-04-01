@@ -197,6 +197,7 @@ const Deposit = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Deposit Details Modal */}
       <Dialog open={depositStep === "details"} onOpenChange={() => setDepositStep("idle")}>
