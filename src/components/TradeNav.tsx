@@ -6,14 +6,12 @@ const leftLinks = [
   { label: "P2P", href: "/" },
   { label: "Fiat Deposit", href: "/deposit" },
   { label: "Withdraw", href: "/withdraw" },
-  { label: "Convert", href: "#" },
+  { label: "Convert", href: "/convert" },
 ];
 
 const rightLinks = [
-  { label: "User Guide", href: "#", hasDropdown: true },
-  { label: "Ads", href: "/my-ads", hasDropdown: true },
-  { label: "Orders", href: "#" },
-  { label: "P2P User Center", href: "#" },
+  { label: "Ads", href: "/my-ads" },
+  { label: "Orders", href: "/orders" },
 ];
 
 const TradeNav = () => {
@@ -23,18 +21,15 @@ const TradeNav = () => {
   return (
     <div className="w-full border-b border-border/40 bg-background">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        {/* Left links */}
         <div className="flex items-center gap-6">
           {leftLinks.map((link) => {
             const isActive = location.pathname === link.href;
             return (
               <button
                 key={link.label}
-                onClick={() => link.href !== "#" && navigate(link.href)}
+                onClick={() => navigate(link.href)}
                 className={`relative text-sm font-medium pb-3 pt-3 transition-colors ${
-                  isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                  isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {link.label}
@@ -45,19 +40,21 @@ const TradeNav = () => {
             );
           })}
         </div>
-
-        {/* Right links */}
         <div className="hidden md:flex items-center gap-5">
-          {rightLinks.map((link) => (
-            <button
-              key={link.label}
-              onClick={() => link.href !== "#" && navigate(link.href)}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {link.label}
-              {link.hasDropdown && <ChevronDown className="h-3 w-3" />}
-            </button>
-          ))}
+          {rightLinks.map((link) => {
+            const isActive = location.pathname === link.href;
+            return (
+              <button
+                key={link.label}
+                onClick={() => navigate(link.href)}
+                className={`text-sm font-medium transition-colors ${
+                  isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {link.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
