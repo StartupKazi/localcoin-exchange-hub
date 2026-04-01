@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Search, ChevronDown, CheckCircle, XCircle, Clock, AlertTriangle, ArrowUpDown, Eye } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import TradeNav from "@/components/TradeNav";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -89,7 +90,7 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-16 md:pb-0">
       <Header />
       <main className="flex-1 pt-16">
         <TradeNav />
@@ -213,6 +214,7 @@ const Orders = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Order Detail Modal */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>

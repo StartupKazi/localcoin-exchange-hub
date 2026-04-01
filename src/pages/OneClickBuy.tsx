@@ -3,6 +3,7 @@ import { ChevronDown, ArrowRight, CheckCircle, Clock, AlertTriangle, Copy, X } f
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TradeNav from "@/components/TradeNav";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -80,7 +81,7 @@ const OneClickBuy = () => {
   const currentPayment = paymentMethods.find((p) => p.id === selectedPayment)!;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-16 md:pb-0">
       <Header />
       <main className="flex-1 pt-16">
         <TradeNav />
@@ -287,6 +288,7 @@ const OneClickBuy = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Order Confirmation Modal */}
       <Dialog open={orderStep === "confirm"} onOpenChange={() => setOrderStep("idle")}>

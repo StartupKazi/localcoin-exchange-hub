@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import TradeNav from "@/components/TradeNav";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -125,7 +126,7 @@ const MyAds = () => {
   const displayAds = activeTab === "listed" ? listedAds : ads;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       <TradeNav />
 
@@ -217,6 +218,7 @@ const MyAds = () => {
         </div>
       </main>
       <Footer />
+      <MobileBottomNav />
 
       {/* Unable to Post Ads Modal */}
       <Dialog open={showPostAdModal} onOpenChange={setShowPostAdModal}>

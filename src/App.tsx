@@ -10,6 +10,7 @@ import Withdraw from "./pages/Withdraw.tsx";
 import Convert from "./pages/Convert.tsx";
 import MyAds from "./pages/MyAds.tsx";
 import Orders from "./pages/Orders.tsx";
+import Disputes from "./pages/Disputes.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/convert" element={<Convert />} />
           <Route path="/my-ads" element={<MyAds />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/disputes" element={<Disputes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
