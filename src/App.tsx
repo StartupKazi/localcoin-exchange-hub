@@ -7,7 +7,9 @@ import Index from "./pages/Index.tsx";
 import OneClickBuy from "./pages/OneClickBuy.tsx";
 import Deposit from "./pages/Deposit.tsx";
 import Withdraw from "./pages/Withdraw.tsx";
+import Convert from "./pages/Convert.tsx";
 import MyAds from "./pages/MyAds.tsx";
+import Orders from "./pages/Orders.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -23,7 +25,9 @@ const App = () => (
           <Route path="/one-click-buy" element={<OneClickBuy />} />
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/convert" element={<Convert />} />
           <Route path="/my-ads" element={<MyAds />} />
+          <Route path="/orders" element={<Orders />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
