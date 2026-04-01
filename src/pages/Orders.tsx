@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Search, ChevronDown, CheckCircle, XCircle, Clock, AlertTriangle, ArrowUpDown, Eye } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import TradeNav from "@/components/TradeNav";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
