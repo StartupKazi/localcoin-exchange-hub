@@ -28,7 +28,7 @@ export default function UserLogin() {
           <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="email" type="email" required placeholder="you@example.com" className="pl-9" />
+            <Input id="email" type="email" required placeholder="you@example.com" className="pl-9" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
         </div>
         <div className="space-y-1.5">
