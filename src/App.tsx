@@ -17,6 +17,16 @@ import Contact from "./pages/Contact.tsx";
 import Referral from "./pages/Referral.tsx";
 import Support from "./pages/Support.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import { ActiveUsers, EmailUnverified, MobileUnverified, BannedUsers, KycUnverified, KycPending, AllUsers } from "./pages/admin/users/UserPages";
+import NotificationToAll from "./pages/admin/users/NotificationToAll";
+import { AllAdverts, AdLimit } from "./pages/admin/ads/AdsPages";
+import { RunningTrades, ReportedTrades, CompletedTrades, AllTrades } from "./pages/admin/trades/TradePages";
+import { PendingWithdrawals, ApprovedWithdrawals, RejectedWithdrawals, AllWithdrawals } from "./pages/admin/withdrawals/WithdrawalPages";
+import { PendingTickets, AnsweredTickets, ClosedTickets, AllTickets } from "./pages/admin/tickets/TicketPages";
+import { TransactionLog, LoginHistory, NotificationHistory } from "./pages/admin/reports/ReportPages";
+import { Cryptos, FiatGateways, PaymentWindows, Deposits as AdminDeposits, Subscribers } from "./pages/admin/CatalogPages";
+import { GeneralSetting, SystemConfiguration, ReferralSetting, NotificationSetting } from "./pages/admin/SettingsPages";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +50,44 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/referral" element={<Referral />} />
           <Route path="/support" element={<Support />} />
+
+          {/* Admin */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users/active" element={<ActiveUsers />} />
+          <Route path="/admin/users/email-unverified" element={<EmailUnverified />} />
+          <Route path="/admin/users/mobile-unverified" element={<MobileUnverified />} />
+          <Route path="/admin/users/banned" element={<BannedUsers />} />
+          <Route path="/admin/users/kyc-unverified" element={<KycUnverified />} />
+          <Route path="/admin/users/kyc-pending" element={<KycPending />} />
+          <Route path="/admin/users/all" element={<AllUsers />} />
+          <Route path="/admin/users/notification" element={<NotificationToAll />} />
+          <Route path="/admin/ads/limit" element={<AdLimit />} />
+          <Route path="/admin/ads/all" element={<AllAdverts />} />
+          <Route path="/admin/trades/running" element={<RunningTrades />} />
+          <Route path="/admin/trades/reported" element={<ReportedTrades />} />
+          <Route path="/admin/trades/completed" element={<CompletedTrades />} />
+          <Route path="/admin/trades/all" element={<AllTrades />} />
+          <Route path="/admin/crypto" element={<Cryptos />} />
+          <Route path="/admin/fiat" element={<FiatGateways />} />
+          <Route path="/admin/payment-windows" element={<PaymentWindows />} />
+          <Route path="/admin/deposits" element={<AdminDeposits />} />
+          <Route path="/admin/withdrawals/pending" element={<PendingWithdrawals />} />
+          <Route path="/admin/withdrawals/approved" element={<ApprovedWithdrawals />} />
+          <Route path="/admin/withdrawals/rejected" element={<RejectedWithdrawals />} />
+          <Route path="/admin/withdrawals/all" element={<AllWithdrawals />} />
+          <Route path="/admin/tickets/pending" element={<PendingTickets />} />
+          <Route path="/admin/tickets/closed" element={<ClosedTickets />} />
+          <Route path="/admin/tickets/answered" element={<AnsweredTickets />} />
+          <Route path="/admin/tickets/all" element={<AllTickets />} />
+          <Route path="/admin/reports/transactions" element={<TransactionLog />} />
+          <Route path="/admin/reports/logins" element={<LoginHistory />} />
+          <Route path="/admin/reports/notifications" element={<NotificationHistory />} />
+          <Route path="/admin/subscribers" element={<Subscribers />} />
+          <Route path="/admin/settings/general" element={<GeneralSetting />} />
+          <Route path="/admin/settings/system" element={<SystemConfiguration />} />
+          <Route path="/admin/settings/referral" element={<ReferralSetting />} />
+          <Route path="/admin/settings/notification" element={<NotificationSetting />} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
