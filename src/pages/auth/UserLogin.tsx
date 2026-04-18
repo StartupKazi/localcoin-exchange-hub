@@ -7,14 +7,19 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function UserLogin() {
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
+    const p = signIn(email);
     toast.success("Welcome back!");
-    navigate("/");
+    navigate(p.kycStatus === "verified" ? "/" : "/profile");
   };
   return (
     <AuthLayout
