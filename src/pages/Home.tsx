@@ -15,8 +15,9 @@ import {
   Lock,
   Plus,
   Minus,
-  Apple,
-  Play,
+  Megaphone,
+  Store,
+  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import Header from "@/components/Header";
@@ -293,41 +294,66 @@ const Home = () => {
           </div>
         </section>
 
-        {/* APP CTA — light */}
+        {/* MARKETPLACE CTA — light */}
         <section className="bg-background py-16">
           <div className="container mx-auto px-4">
             <div className="bg-card border border-border/30 rounded-3xl p-8 lg:p-12 grid md:grid-cols-2 gap-8 items-center shadow-sm">
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">MOBILE APP</span>
+                <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">OPEN MARKETPLACE</span>
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
-                  LocalCoinEx Buy/Sell App is coming to your pocket.
+                  Trade peer-to-peer or post your own ad in minutes.
                 </h3>
                 <p className="text-muted-foreground mb-5">
-                  Get ready to trade anywhere, anytime. Pre-order notifications open soon — be the first to know when we launch.
+                  LocalCoin's open P2P market connects you with thousands of verified merchants worldwide. Browse live offers, set your own price, or become a merchant by publishing an advertisement — all backed by escrow protection.
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">Realtime orders</span>
-                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">Push notifications</span>
-                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">Secure storage</span>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">300+ payment methods</span>
+                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">Escrow secured</span>
+                  <span className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">Zero deposit fees</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => navigate("/p2p")}
+                    className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:brightness-110 transition flex items-center gap-2"
+                  >
+                    Open P2P Market <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/my-ads")}
+                    className="px-6 py-3 rounded-full border border-border text-foreground font-semibold hover:bg-muted/50 transition"
+                  >
+                    Post an Ad
+                  </button>
                 </div>
               </div>
-              <div className="flex flex-col gap-3 items-center md:items-end">
-                <button className="relative w-64 flex items-center gap-3 bg-foreground text-background rounded-xl px-5 py-3 hover:opacity-90 transition">
-                  <Apple className="h-7 w-7" />
-                  <div className="text-left">
-                    <div className="text-[10px] opacity-80">Coming Soon on the</div>
-                    <div className="text-base font-bold">App Store</div>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="flex gap-4 p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-border/30">
+                  <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                    <Store className="h-6 w-6 text-primary" />
                   </div>
-                  <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold rotate-12">Coming Soon</span>
-                </button>
-                <button className="relative w-64 flex items-center gap-3 bg-foreground text-background rounded-xl px-5 py-3 hover:opacity-90 transition">
-                  <Play className="h-7 w-7" />
-                  <div className="text-left">
-                    <div className="text-[10px] opacity-80">Coming Soon on</div>
-                    <div className="text-base font-bold">Google Play</div>
+                  <div>
+                    <h4 className="font-bold text-foreground mb-1">Browse the open market</h4>
+                    <p className="text-sm text-muted-foreground">240,000+ active traders posting live buy and sell offers across 50+ assets.</p>
                   </div>
-                  <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold rotate-12">Coming Soon</span>
-                </button>
+                </div>
+                <div className="flex gap-4 p-5 rounded-2xl bg-gradient-to-br from-sky-50 to-indigo-50 border border-border/30">
+                  <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                    <Megaphone className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground mb-1">Advertise your offer</h4>
+                    <p className="text-sm text-muted-foreground">Set your price, choose payment methods and reach buyers in seconds.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-border/30">
+                  <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground mb-1">Instant settlements</h4>
+                    <p className="text-sm text-muted-foreground">Funds release the moment payment is confirmed — no waiting around.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
