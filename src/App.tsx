@@ -27,6 +27,12 @@ import { PendingTickets, AnsweredTickets, ClosedTickets, AllTickets } from "./pa
 import { TransactionLog, LoginHistory, NotificationHistory } from "./pages/admin/reports/ReportPages";
 import { Cryptos, FiatGateways, PaymentWindows, Deposits as AdminDeposits, Subscribers } from "./pages/admin/CatalogPages";
 import { GeneralSetting, SystemConfiguration, ReferralSetting, NotificationSetting } from "./pages/admin/SettingsPages";
+import UserLogin from "./pages/auth/UserLogin";
+import UserRegister from "./pages/auth/UserRegister";
+import UserForgotPassword from "./pages/auth/UserForgotPassword";
+import AdminLogin from "./pages/auth/AdminLogin";
+import AdminRegister from "./pages/auth/AdminRegister";
+import AdminForgotPassword from "./pages/auth/AdminForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +56,14 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/referral" element={<Referral />} />
           <Route path="/support" element={<Support />} />
+
+          {/* Auth */}
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/register" element={<UserRegister />} />
+          <Route path="/forgot-password" element={<UserForgotPassword />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
 
           {/* Admin */}
           <Route path="/admin" element={<AdminDashboard />} />
