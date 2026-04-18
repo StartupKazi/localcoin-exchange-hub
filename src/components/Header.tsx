@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X, ShieldCheck, ShieldAlert, Clock, LogIn, LogOut } from "lucide-react";
+import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X, ShieldCheck, ShieldAlert, Clock, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,17 +13,29 @@ const navItems: NavItem[] = [
     children: [
       { label: "One-Click Buy", href: "/one-click-buy" },
       { label: "P2P", href: "/p2p" },
+      { label: "Convert", href: "/convert" },
       { label: "Fiat Deposit", href: "/deposit" },
+      { label: "Withdraw", href: "/withdraw" },
     ],
   },
   { label: "Advertisements", href: "/my-ads" },
-  { label: "Transactions", href: "/transactions" },
+  {
+    label: "Activity",
+    children: [
+      { label: "Orders", href: "/orders" },
+      { label: "Transactions", href: "/transactions" },
+      { label: "Disputes", href: "/disputes" },
+    ],
+  },
   { label: "Contact", href: "/contact" },
   {
     label: "More",
     children: [
       { label: "Referral", href: "/referral" },
       { label: "Support", href: "/support" },
+      { label: "My Profile", href: "/profile" },
+      { label: "KYC Verification", href: "/kyc" },
+      { label: "Admin Dashboard", href: "/admin" },
     ],
   },
 ];
@@ -249,6 +261,9 @@ const Header = () => {
                       </button>
                     )}
                     <button onClick={() => { navigate("/transactions"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors">Dashboard</button>
+                    <button onClick={() => { navigate("/admin"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors flex items-center gap-2">
+                      <LayoutDashboard className="h-4 w-4" /> Admin Dashboard
+                    </button>
                     <div className="border-t border-white/10 my-1" />
                     <button onClick={() => { signOut(); navigate("/"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-destructive hover:bg-white/5 transition-colors flex items-center gap-2">
                       <LogOut className="h-4 w-4" /> Logout
@@ -260,6 +275,10 @@ const Header = () => {
                       <LogIn className="h-4 w-4" /> Sign in
                     </button>
                     <button onClick={() => { navigate("/register"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-primary hover:bg-white/5 transition-colors">Create account</button>
+                    <div className="border-t border-white/10 my-1" />
+                    <button onClick={() => { navigate("/admin/login"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors flex items-center gap-2">
+                      <LayoutDashboard className="h-4 w-4" /> Admin Console
+                    </button>
                   </>
                 )}
               </div>

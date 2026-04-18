@@ -11,13 +11,12 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function UserLogin() {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("demo@localcoin.io");
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    const p = signIn(email);
+    const p = signIn(email || "demo@localcoin.io");
     toast.success("Welcome back!");
     navigate(p.kycStatus === "verified" ? "/" : "/profile");
   };
@@ -33,14 +32,14 @@ export default function UserLogin() {
           <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="email" type="email" required placeholder="you@example.com" className="pl-9" value={email} onChange={e => setEmail(e.target.value)} />
+            <Input id="email" type="email" placeholder="you@example.com" className="pl-9" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="password" type={show ? "text" : "password"} required placeholder="••••••••" className="pl-9 pr-9" />
+            <Input id="password" type={show ? "text" : "password"} defaultValue="demopassword" placeholder="••••••••" className="pl-9 pr-9" />
             <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

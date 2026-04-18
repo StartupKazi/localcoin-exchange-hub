@@ -29,7 +29,7 @@ export default function AdminForgotPassword() {
             <Label htmlFor="email">Admin email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="email" type="email" required placeholder="admin@localcoin.io" className="pl-9" />
+              <Input id="email" type="email" placeholder="admin@localcoin.io" className="pl-9" />
             </div>
           </div>
           <Button type="submit" className="w-full">Send reset link</Button>

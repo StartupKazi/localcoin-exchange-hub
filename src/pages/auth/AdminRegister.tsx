@@ -25,28 +25,28 @@ export default function AdminRegister() {
           <Label htmlFor="name">Full name</Label>
           <div className="relative">
             <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="name" required placeholder="Jane Admin" className="pl-9" />
+            <Input id="name" placeholder="Jane Admin" className="pl-9" />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">Work email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="email" type="email" required placeholder="admin@localcoin.io" className="pl-9" />
+            <Input id="email" type="email" placeholder="admin@localcoin.io" className="pl-9" />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="invite">Invite code</Label>
           <div className="relative">
             <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="invite" required placeholder="Provided by super admin" className="pl-9" />
+            <Input id="invite" placeholder="Provided by super admin" className="pl-9" />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="password" type="password" required placeholder="Min 12 characters" className="pl-9" />
+            <Input id="password" type="password" placeholder="Min 12 characters" className="pl-9" />
           </div>
         </div>
         <Button type="submit" className="w-full">Submit request</Button>
