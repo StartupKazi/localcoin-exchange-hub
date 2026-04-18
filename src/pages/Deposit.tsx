@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, ArrowRight, Wallet, DollarSign, Rocket, Search, CheckCircle, Copy, Clock, AlertTriangle } from "lucide-react";
 import Header from "@/components/Header";
+import cryptoDepositHero from "@/assets/crypto-deposit-hero.jpg";
 import Footer from "@/components/Footer";
 import TradeNav from "@/components/TradeNav";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -136,9 +137,37 @@ const Deposit = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-10">
-            <div className="flex-1 space-y-4">
-              <h1 className="text-3xl font-bold text-foreground">Deposit {selectedCurrency}</h1>
-              <p className="text-muted-foreground text-base max-w-lg">Purchase crypto instantly with deposits from your bank account.</p>
+            <div className="flex-1 space-y-6">
+              <div className="space-y-4">
+                <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">Fast & Secure</span>
+                <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">Deposit {selectedCurrency}</h1>
+                <p className="text-muted-foreground text-base max-w-lg">Purchase crypto instantly with deposits from your bank account. Zero fees, real-time settlement.</p>
+              </div>
+              <div className="relative rounded-3xl overflow-hidden border border-border/30 bg-gradient-to-br from-primary/5 to-accent/5 max-w-lg">
+                <img
+                  src={cryptoDepositHero}
+                  alt="Crypto coins deposit illustration"
+                  width={1024}
+                  height={1024}
+                  loading="lazy"
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <div className="grid grid-cols-3 gap-3 max-w-lg">
+                <div className="p-3 rounded-xl border border-border/30 bg-card/50">
+                  <p className="text-xs text-muted-foreground">Speed</p>
+                  <p className="text-sm font-bold text-foreground">5-30 min</p>
+                </div>
+                <div className="p-3 rounded-xl border border-border/30 bg-card/50">
+                  <p className="text-xs text-muted-foreground">Fees</p>
+                  <p className="text-sm font-bold text-primary">0%</p>
+                </div>
+                <div className="p-3 rounded-xl border border-border/30 bg-card/50">
+                  <p className="text-xs text-muted-foreground">Support</p>
+                  <p className="text-sm font-bold text-foreground">24/7</p>
+                </div>
+              </div>
             </div>
 
             <div className="w-full lg:w-[460px] shrink-0">
