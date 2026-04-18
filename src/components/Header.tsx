@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X, ShieldCheck, ShieldAlert, Clock, LogIn, LogOut } from "lucide-react";
+import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X, ShieldCheck, ShieldAlert, Clock, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/useAuth";
