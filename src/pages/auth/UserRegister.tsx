@@ -12,17 +12,18 @@ import { useAuth } from "@/hooks/useAuth";
 export default function UserRegister() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
-  const [first, setFirst] = useState("");
-  const [last, setLast] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [first, setFirst] = useState("Demo");
+  const [last, setLast] = useState("User");
+  const [email, setEmail] = useState("demo@localcoin.io");
+  const [phone, setPhone] = useState("+1 555 000 0000");
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!first || !email) {
-      toast.error("Please fill required fields");
-      return;
-    }
-    signUp({ firstName: first, lastName: last, email, phone });
+    signUp({
+      firstName: first || "Demo",
+      lastName: last || "User",
+      email: email || "demo@localcoin.io",
+      phone,
+    });
     toast.success("Account created! Let's verify your identity.");
     navigate("/kyc");
   };
