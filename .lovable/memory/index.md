@@ -5,11 +5,10 @@ Updated: now
 
 ## Core
 Platform: LocalCoin Trade (P2P trading).
-NO DARK MODE. Light-themed strictly.
+NO global dark mode. Light-themed strictly. Admin uses scoped `.admin-theme` class for dark surfaces.
 Header: #021B38. Body bg: #F6F7FA. Content in white boxes.
 Mobile: main pages need pb-16 to avoid bottom nav overlap.
 P2P flow: strict safety checks, KYC, and security modals before ordering.
-Admin panel lives at /admin and uses dark sidebar tokens (sidebar-*) — its sidebar is allowed to be dark while the main content stays light.
 
 ## Memories
 - [Theme and Constraints](mem://style/theme-constraints) — No dark mode. Dark navy header, light gray body, white boxes, mobile pb-16
@@ -24,4 +23,5 @@ Admin panel lives at /admin and uses dark sidebar tokens (sidebar-*) — its sid
 - [Convert Page](mem://features/convert-page) — Instant zero-fee crypto-to-crypto swaps with real-time rates
 - [Order Management](mem://features/order-management) — Trade history dashboard with status tracking and filtering
 - [Dispute Center](mem://features/dispute-center) — Lifecycle management for trade conflicts with timeline and evidence submission
-- [Admin Panel](mem://features/admin-panel) — Full admin at /admin with sidebar + 30+ pages (users, ads, trades, withdrawals, tickets, reports, settings)
+- [Admin Panel](mem://features/admin-panel) — Dark scoped admin shell, sidebar, 30+ pages, dashboard charts
+- [Auth Pages](mem://features/auth-pages) — Mock user/admin login, register, forgot-password with shared AuthLayout
