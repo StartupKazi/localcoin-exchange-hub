@@ -13,17 +13,29 @@ const navItems: NavItem[] = [
     children: [
       { label: "One-Click Buy", href: "/one-click-buy" },
       { label: "P2P", href: "/p2p" },
+      { label: "Convert", href: "/convert" },
       { label: "Fiat Deposit", href: "/deposit" },
+      { label: "Withdraw", href: "/withdraw" },
     ],
   },
   { label: "Advertisements", href: "/my-ads" },
-  { label: "Transactions", href: "/transactions" },
+  {
+    label: "Activity",
+    children: [
+      { label: "Orders", href: "/orders" },
+      { label: "Transactions", href: "/transactions" },
+      { label: "Disputes", href: "/disputes" },
+    ],
+  },
   { label: "Contact", href: "/contact" },
   {
     label: "More",
     children: [
       { label: "Referral", href: "/referral" },
       { label: "Support", href: "/support" },
+      { label: "My Profile", href: "/profile" },
+      { label: "KYC Verification", href: "/kyc" },
+      { label: "Admin Dashboard", href: "/admin" },
     ],
   },
 ];
