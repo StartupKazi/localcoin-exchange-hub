@@ -143,14 +143,14 @@ const Deposit = () => {
                 <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">Deposit {selectedCurrency}</h1>
                 <p className="text-muted-foreground text-base max-w-lg">Purchase crypto instantly with deposits from your bank account. Zero fees, real-time settlement.</p>
               </div>
-              <div className="relative rounded-3xl overflow-hidden border border-border/30 bg-gradient-to-br from-primary/5 to-accent/5 max-w-lg">
+              <div className="relative rounded-2xl overflow-hidden border border-border/30 bg-gradient-to-br from-primary/5 to-accent/5 max-w-md aspect-[16/9]">
                 <img
                   src={cryptoDepositHero}
                   alt="Crypto coins deposit illustration"
                   width={1024}
                   height={1024}
                   loading="lazy"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
               </div>
