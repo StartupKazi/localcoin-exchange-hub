@@ -47,6 +47,7 @@ const Header = () => {
   const [balanceHidden, setBalanceHidden] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile, signOut } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const assetsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
