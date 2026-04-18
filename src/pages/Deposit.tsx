@@ -136,14 +136,14 @@ const Deposit = () => {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-10">
-            <div className="flex-1 space-y-6">
+          <div className="flex flex-col lg:flex-row gap-10 lg:items-start">
+            <div className="w-full lg:flex-[3] space-y-6">
               <div className="space-y-4">
                 <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">Fast & Secure</span>
                 <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">Deposit {selectedCurrency}</h1>
-                <p className="text-muted-foreground text-base max-w-lg">Purchase crypto instantly with deposits from your bank account. Zero fees, real-time settlement.</p>
+                <p className="text-muted-foreground text-base max-w-xl">Purchase crypto instantly with deposits from your bank account. Zero fees, real-time settlement.</p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden border border-border/30 bg-gradient-to-br from-primary/5 to-accent/5 max-w-md aspect-[16/9]">
+              <div className="relative rounded-2xl overflow-hidden border border-border/30 bg-gradient-to-br from-primary/5 to-accent/5 aspect-[16/9] max-w-2xl">
                 <img
                   src={cryptoDepositHero}
                   alt="Crypto coins deposit illustration"
@@ -154,7 +154,7 @@ const Deposit = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
               </div>
-              <div className="grid grid-cols-3 gap-3 max-w-lg">
+              <div className="grid grid-cols-3 gap-3 max-w-2xl">
                 <div className="p-3 rounded-xl border border-border/30 bg-card/50">
                   <p className="text-xs text-muted-foreground">Speed</p>
                   <p className="text-sm font-bold text-foreground">5-30 min</p>
@@ -170,7 +170,7 @@ const Deposit = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-[460px] shrink-0">
+            <div className="w-full lg:flex-[2] lg:mt-40">
               <div className="bg-card rounded-2xl border border-border/30 p-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-foreground">Fiat Deposit</h2>
