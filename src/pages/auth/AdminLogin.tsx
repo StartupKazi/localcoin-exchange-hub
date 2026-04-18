@@ -24,21 +24,21 @@ export default function AdminLogin() {
     >
       <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-secondary/40 p-3 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
-        Two-factor authentication is required for all admin accounts.
+        Two-factor authentication is for all admin accounts.
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">Admin email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="email" type="email" required placeholder="admin@localcoin.io" className="pl-9" />
+            <Input id="email" type="email" placeholder="admin@localcoin.io" className="pl-9" />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="password" type={show ? "text" : "password"} required placeholder="••••••••" className="pl-9 pr-9" />
+            <Input id="password" type={show ? "text" : "password"} placeholder="••••••••" className="pl-9 pr-9" />
             <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
