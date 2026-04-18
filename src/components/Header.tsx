@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X } from "lucide-react";
+import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X, ShieldCheck, ShieldAlert, Clock, LogIn, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavItem = { label: string; href?: string; children?: { label: string; href: string }[] };
 
@@ -46,6 +47,7 @@ const Header = () => {
   const [balanceHidden, setBalanceHidden] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile, signOut } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const assetsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -216,31 +218,50 @@ const Header = () => {
           <div ref={profileRef} className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="h-8 w-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:bg-primary/30 transition-colors"
+              className="h-8 w-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:bg-primary/30 transition-colors relative"
             >
               <User className="h-4 w-4 text-primary" />
+              {profile && profile.kycStatus !== "verified" && (
+                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 border border-[hsl(var(--nav-bg))]" />
+              )}
             </button>
             {profileOpen && (
-              <div className="absolute top-full mt-2 right-0 w-48 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
-                <button
-                  onClick={() => { navigate("/transactions"); setProfileOpen(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => { navigate("/support"); setProfileOpen(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
-                >
-                  Settings
-                </button>
-                <div className="border-t border-white/10 my-1" />
-                <button
-                  onClick={() => { navigate("/"); setProfileOpen(false); }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-destructive hover:bg-white/5 transition-colors"
-                >
-                  Logout
-                </button>
+              <div className="absolute top-full mt-2 right-0 w-60 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
+                {profile ? (
+                  <>
+                    <div className="px-4 py-2 border-b border-white/10">
+                      <div className="text-sm font-semibold text-white truncate">{profile.firstName} {profile.lastName}</div>
+                      <div className="text-xs text-white/60 truncate">{profile.email}</div>
+                      <div className="mt-2 flex items-center gap-1.5 text-xs">
+                        {profile.kycStatus === "verified" ? (
+                          <span className="inline-flex items-center gap-1 text-green-400"><ShieldCheck className="h-3.5 w-3.5" /> KYC Verified</span>
+                        ) : profile.kycStatus === "pending" ? (
+                          <span className="inline-flex items-center gap-1 text-amber-400"><Clock className="h-3.5 w-3.5" /> KYC Pending</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-amber-400"><ShieldAlert className="h-3.5 w-3.5" /> KYC Required</span>
+                        )}
+                      </div>
+                    </div>
+                    <button onClick={() => { navigate("/profile"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors">My Profile</button>
+                    {profile.kycStatus !== "verified" && (
+                      <button onClick={() => { navigate("/kyc"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-amber-400 hover:bg-white/5 transition-colors flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4" /> Complete KYC
+                      </button>
+                    )}
+                    <button onClick={() => { navigate("/transactions"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors">Dashboard</button>
+                    <div className="border-t border-white/10 my-1" />
+                    <button onClick={() => { signOut(); navigate("/"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-destructive hover:bg-white/5 transition-colors flex items-center gap-2">
+                      <LogOut className="h-4 w-4" /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => { navigate("/login"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors flex items-center gap-2">
+                      <LogIn className="h-4 w-4" /> Sign in
+                    </button>
+                    <button onClick={() => { navigate("/register"); setProfileOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-primary hover:bg-white/5 transition-colors">Create account</button>
+                  </>
+                )}
               </div>
             )}
           </div>

@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import TradeNav from "@/components/TradeNav";
 import P2PDashboard from "@/components/P2PDashboard";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import KycBanner from "@/components/KycGate";
 
 const Index = () => {
   return (
@@ -10,6 +11,7 @@ const Index = () => {
       <Header />
       <main className="flex-1 pt-16">
         <TradeNav />
+        <KycBanner />
         <div className="pt-4 pb-16">
           <P2PDashboard />
         </div>
