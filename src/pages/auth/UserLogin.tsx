@@ -39,7 +39,7 @@ export default function UserLogin() {
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="password" type={show ? "text" : "password"} required placeholder="••••••••" className="pl-9 pr-9" />
+            <Input id="password" type={show ? "text" : "password"} defaultValue="demopassword" placeholder="••••••••" className="pl-9 pr-9" />
             <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
