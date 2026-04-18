@@ -17,6 +17,8 @@ import Contact from "./pages/Contact.tsx";
 import Referral from "./pages/Referral.tsx";
 import Support from "./pages/Support.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Profile from "./pages/Profile.tsx";
+import Kyc from "./pages/Kyc.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { ActiveUsers, EmailUnverified, MobileUnverified, BannedUsers, KycUnverified, KycPending, AllUsers } from "./pages/admin/users/UserPages";
 import NotificationToAll from "./pages/admin/users/NotificationToAll";
@@ -56,6 +58,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/referral" element={<Referral />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/kyc" element={<Kyc />} />
 
           {/* Auth */}
           <Route path="/login" element={<UserLogin />} />
