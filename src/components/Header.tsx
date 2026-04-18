@@ -151,6 +151,22 @@ const Header = () => {
           >
             Deposit
           </button>
+          {!profile && (
+            <>
+              <button
+                onClick={() => navigate("/login")}
+                className="text-sm font-medium text-white/90 hover:text-primary transition-colors"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                className="text-sm font-medium text-white/90 hover:text-primary transition-colors"
+              >
+                Register
+              </button>
+            </>
+          )}
 
           <div ref={assetsRef} className="relative">
             <button
