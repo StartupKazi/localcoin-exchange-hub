@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 
 const leftLinks = [
   { label: "One-Click Buy", href: "/one-click-buy" },
-  { label: "P2P", href: "/" },
+  { label: "P2P", href: "/p2p" },
   { label: "Fiat Deposit", href: "/deposit" },
   { label: "Withdraw", href: "/withdraw" },
   { label: "Convert", href: "/convert" },
