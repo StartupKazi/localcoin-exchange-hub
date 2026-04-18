@@ -1,25 +1,35 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell } from "lucide-react";
+import { ChevronDown, User, Eye, EyeOff, Download, Upload, Bell, Menu, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Buy", href: "/one-click-buy", hasDropdown: true },
-  { label: "Sell", href: "/", hasDropdown: true },
-  { label: "Contact", href: "/" },
-];
+type NavItem = { label: string; href?: string; children?: { label: string; href: string }[] };
 
-const moreLinks = [
-  { label: "Advertisements", href: "/" },
-  { label: "Trades", href: "/" },
-  { label: "Wallets", href: "/" },
-  { label: "Transactions", href: "/" },
+const navItems: NavItem[] = [
+  { label: "Home", href: "/" },
+  {
+    label: "Trade",
+    children: [
+      { label: "One-Click Buy", href: "/one-click-buy" },
+      { label: "P2P", href: "/p2p" },
+      { label: "Fiat Deposit", href: "/deposit" },
+    ],
+  },
+  { label: "Advertisements", href: "/my-ads" },
+  { label: "Transactions", href: "/transactions" },
+  { label: "Contact", href: "/contact" },
+  {
+    label: "More",
+    children: [
+      { label: "Referral", href: "/referral" },
+      { label: "Support", href: "/support" },
+    ],
+  },
 ];
 
 const assetsLinks = [
-  { label: "Funding Account", href: "/" },
-  { label: "Unified Trading Account", href: "/" },
+  { label: "Funding Account", href: "/transactions" },
+  { label: "Unified Trading Account", href: "/transactions" },
 ];
 
 const investedLinks = [
@@ -29,14 +39,15 @@ const investedLinks = [
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [assetsOpen, setAssetsOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [balanceHidden, setBalanceHidden] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const assetsRef = useRef<HTMLDivElement>(null);
-  const moreRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,13 +58,21 @@ const Header = () => {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpenDropdown(null);
       if (assetsRef.current && !assetsRef.current.contains(e.target as Node)) setAssetsOpen(false);
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  const go = (href: string) => {
+    navigate(href);
+    setOpenDropdown(null);
+    setMobileOpen(false);
+  };
+
+  const isActive = (href?: string) => href && location.pathname === href;
 
   return (
     <header
@@ -66,49 +85,52 @@ const Header = () => {
           <img src={logo} alt="LocalCoin Trade" className="h-10" />
         </button>
 
-        <nav className="hidden lg:flex items-center gap-5">
-          {navLinks.map((link) => (
-            <button
-              key={link.label}
-              onClick={() => navigate(link.href)}
-              className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                location.pathname === link.href
-                  ? "text-primary"
-                  : "text-white/90 hover:text-primary"
-              }`}
-            >
-              {link.label}
-              {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
-            </button>
-          ))}
-
-          {/* More Dropdown */}
-          <div ref={moreRef} className="relative">
-            <button
-              onClick={() => setMoreOpen(!moreOpen)}
-              className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
-            >
-              More
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
-            </button>
-            {moreOpen && (
-              <div className="absolute top-full mt-2 left-0 w-48 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
-                {moreLinks.map((link) => (
-                  <button
-                    key={link.label}
-                    onClick={() => { navigate(link.href); setMoreOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
-                  >
-                    {link.label}
-                  </button>
-                ))}
+        {/* Desktop nav */}
+        <nav ref={dropdownRef} className="hidden lg:flex items-center gap-5">
+          {navItems.map((item) => {
+            if (!item.children) {
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => go(item.href!)}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive(item.href) ? "text-primary" : "text-white/90 hover:text-primary"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            }
+            const open = openDropdown === item.label;
+            return (
+              <div key={item.label} className="relative">
+                <button
+                  onClick={() => setOpenDropdown(open ? null : item.label)}
+                  className="flex items-center gap-1 text-sm font-medium text-white/90 hover:text-primary transition-colors"
+                >
+                  {item.label}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+                </button>
+                {open && (
+                  <div className="absolute top-full mt-2 left-0 w-52 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
+                    {item.children.map((child) => (
+                      <button
+                        key={child.label}
+                        onClick={() => go(child.href)}
+                        className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
+                      >
+                        {child.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })}
         </nav>
 
+        {/* Right cluster (desktop) */}
         <div className="hidden lg:flex items-center gap-3">
-          {/* Deposit Button */}
           <button
             onClick={() => navigate("/deposit")}
             className="px-5 py-2 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:brightness-110 transition"
@@ -116,7 +138,6 @@ const Header = () => {
             Deposit
           </button>
 
-          {/* Assets Dropdown */}
           <div ref={assetsRef} className="relative">
             <button
               onClick={() => setAssetsOpen(!assetsOpen)}
@@ -129,7 +150,6 @@ const Header = () => {
             </button>
             {assetsOpen && (
               <div className="absolute top-full mt-2 right-0 w-72 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-4 z-50">
-                {/* Assets Overview */}
                 <div className="px-4 pb-3 border-b border-white/10">
                   <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
                     Assets Overview
@@ -143,29 +163,13 @@ const Header = () => {
                   <div className="text-xs text-white/50 mt-0.5">
                     ≈ {balanceHidden ? "******" : "0.000000"} BTC
                   </div>
-                  <p className="text-xs text-white/40 mt-2">*Data may be delayed.</p>
                   <div className="flex gap-2 mt-3">
-                    <div className="flex-1 relative group">
-                      <button
-                        className="w-full flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
-                      >
-                        <Download className="h-4 w-4" /> Deposit <ChevronDown className="h-3 w-3" />
-                      </button>
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-[hsl(var(--nav-bg))] border border-border/20 rounded-lg shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                        <button
-                          onClick={() => { navigate("/deposit"); setAssetsOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
-                        >
-                          Fiat Deposit
-                        </button>
-                        <button
-                          onClick={() => { navigate("/"); setAssetsOpen(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm text-white/90 hover:bg-white/10 transition-colors"
-                        >
-                          P2P Deposit
-                        </button>
-                      </div>
-                    </div>
+                    <button
+                      onClick={() => { navigate("/deposit"); setAssetsOpen(false); }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
+                    >
+                      <Download className="h-4 w-4" /> Deposit
+                    </button>
                     <button
                       onClick={() => { navigate("/withdraw"); setAssetsOpen(false); }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full border border-white/20 text-sm text-white/90 hover:bg-white/5 transition-colors"
@@ -174,8 +178,6 @@ const Header = () => {
                     </button>
                   </div>
                 </div>
-
-                {/* Account */}
                 <div className="px-4 pt-3">
                   <p className="text-xs text-white/40 mb-2">Account</p>
                   {assetsLinks.map((link) => (
@@ -188,8 +190,6 @@ const Header = () => {
                     </button>
                   ))}
                 </div>
-
-                {/* Invested Products */}
                 <div className="px-4 pt-3 mt-2 border-t border-white/10">
                   <p className="text-xs text-white/40 mb-2">Invested Products</p>
                   {investedLinks.map((link) => (
@@ -206,7 +206,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Notifications */}
           <button className="relative text-white/70 hover:text-primary transition-colors">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center">
@@ -214,7 +213,6 @@ const Header = () => {
             </span>
           </button>
 
-          {/* Profile */}
           <div ref={profileRef} className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
@@ -225,13 +223,13 @@ const Header = () => {
             {profileOpen && (
               <div className="absolute top-full mt-2 right-0 w-48 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
                 <button
-                  onClick={() => { navigate("/"); setProfileOpen(false); }}
+                  onClick={() => { navigate("/transactions"); setProfileOpen(false); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => { navigate("/"); setProfileOpen(false); }}
+                  onClick={() => { navigate("/support"); setProfileOpen(false); }}
                   className="w-full text-left px-4 py-2.5 text-sm text-white/90 hover:text-primary hover:bg-white/5 transition-colors"
                 >
                   Settings
@@ -247,7 +245,78 @@ const Header = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile toggle */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="lg:hidden text-white p-2"
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="lg:hidden border-t border-white/10 bg-[hsl(var(--nav-bg))] max-h-[calc(100vh-64px)] overflow-y-auto">
+          <nav className="container mx-auto px-4 py-3 flex flex-col">
+            {navItems.map((item) => {
+              if (!item.children) {
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => go(item.href!)}
+                    className={`text-left py-3 text-sm font-medium border-b border-white/5 ${
+                      isActive(item.href) ? "text-primary" : "text-white/90"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              }
+              const open = openDropdown === item.label;
+              return (
+                <div key={item.label} className="border-b border-white/5">
+                  <button
+                    onClick={() => setOpenDropdown(open ? null : item.label)}
+                    className="w-full flex items-center justify-between py-3 text-sm font-medium text-white/90"
+                  >
+                    {item.label}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+                  </button>
+                  {open && (
+                    <div className="pb-2 pl-3">
+                      {item.children.map((c) => (
+                        <button
+                          key={c.label}
+                          onClick={() => go(c.href)}
+                          className="w-full text-left py-2 text-sm text-white/70 hover:text-primary"
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => go("/deposit")}
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground"
+              >
+                Deposit
+              </button>
+              <button
+                onClick={() => go("/withdraw")}
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-full border border-white/20 text-white"
+              >
+                Withdraw
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
