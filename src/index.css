@@ -43,14 +43,47 @@
     --success: 142 71% 45%;
     --warning: 37 90% 55%;
 
-    --sidebar-background: 216 35% 10%;
-    --sidebar-foreground: 210 40% 96%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 88%;
     --sidebar-primary: 37 90% 55%;
-    --sidebar-primary-foreground: 216 50% 10%;
-    --sidebar-accent: 216 30% 20%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 216 25% 22%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 18%;
     --sidebar-ring: 37 90% 55%;
+
+    /* Admin scoped dark surface tokens */
+    --admin-bg: 0 0% 9%;
+    --admin-surface: 0 0% 11%;
+    --admin-surface-2: 0 0% 14%;
+    --admin-border: 0 0% 18%;
+    --admin-foreground: 0 0% 96%;
+    --admin-muted: 0 0% 62%;
+  }
+
+  /* Scoped dark theme for admin only — does NOT enable global dark mode */
+  .admin-theme {
+    --background: var(--admin-bg);
+    --foreground: var(--admin-foreground);
+    --card: var(--admin-surface);
+    --card-foreground: var(--admin-foreground);
+    --popover: var(--admin-surface);
+    --popover-foreground: var(--admin-foreground);
+    --secondary: var(--admin-surface-2);
+    --secondary-foreground: var(--admin-foreground);
+    --muted: var(--admin-surface-2);
+    --muted-foreground: var(--admin-muted);
+    --accent: var(--admin-surface-2);
+    --accent-foreground: var(--admin-foreground);
+    --border: var(--admin-border);
+    --input: var(--admin-border);
+  }
+  .admin-theme {
+    background-color: hsl(var(--admin-bg));
+    color: hsl(var(--admin-foreground));
+    background-image:
+      radial-gradient(hsl(0 0% 100% / 0.025) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
 }
 
