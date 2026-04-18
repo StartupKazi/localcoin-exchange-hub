@@ -11,13 +11,12 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function UserLogin() {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("demo@localcoin.io");
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    const p = signIn(email);
+    const p = signIn(email || "demo@localcoin.io");
     toast.success("Welcome back!");
     navigate(p.kycStatus === "verified" ? "/" : "/profile");
   };
