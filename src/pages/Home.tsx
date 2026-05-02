@@ -18,11 +18,29 @@ import {
   Megaphone,
   Store,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+
+const ocbCryptoOptions = ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "TRX"];
+const ocbFiatOptions = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
+const ocbPaymentMethods = [
+  { id: "bank", label: "Bank Transfer", icon: "🏦" },
+  { id: "card", label: "Bank Card", icon: "💳" },
+  { id: "mpesa", label: "M-Pesa", icon: "📱" },
+];
+const ocbRates: Record<string, Record<string, number>> = {
+  BTC: { KES: 8801652, USD: 86502, NGN: 135000000, GHS: 1200000, TZS: 220000000, UGX: 320000000 },
+  ETH: { KES: 258000, USD: 2450, NGN: 3800000, GHS: 35000, TZS: 6200000, UGX: 9000000 },
+  USDT: { KES: 129, USD: 1, NGN: 1550, GHS: 14, TZS: 2550, UGX: 3700 },
+  USDC: { KES: 129, USD: 1, NGN: 1550, GHS: 14, TZS: 2550, UGX: 3700 },
+  BNB: { KES: 78000, USD: 605, NGN: 940000, GHS: 8500, TZS: 1540000, UGX: 2230000 },
+  SOL: { KES: 17800, USD: 138, NGN: 215000, GHS: 1950, TZS: 352000, UGX: 510000 },
+  TRX: { KES: 32, USD: 0.25, NGN: 390, GHS: 3.5, TZS: 638, UGX: 925 },
+};
 
 const heroPattern =
   "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1600&q=80";
