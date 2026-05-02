@@ -710,7 +710,8 @@ const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" |
 };
 
 // ─── Order Page (full-page, replaces dashboard) ─────────────────────
-type OrderStep = "pending_payment" | "coin_release" | "success" | "disputed";
+type OrderStep = "pending_payment" | "pending_release" | "completed_review" | "disputed";
+type ChatMsg = { from: "system" | "buyer" | "seller"; text: string; ts: string; kind?: "text" | "file" | "info" };
 
 const OrderPage = ({
   offer,
@@ -729,9 +730,15 @@ const OrderPage = ({
   const [showConfirmPayment, setShowConfirmPayment] = useState(false);
   const [showCancelOrder, setShowCancelOrder] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
+  const [showCompletedPopup, setShowCompletedPopup] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
+  const [extraMessages, setExtraMessages] = useState<ChatMsg[]>([]);
+  const [rating, setRating] = useState<"good" | "bad" | null>(null);
   const [minutes, setMinutes] = useState(14);
-  const [seconds, setSeconds] = useState(59);
+  const [seconds, setSeconds] = useState(50);
+  const [releaseMin, setReleaseMin] = useState(4);
+  const [releaseSec, setReleaseSec] = useState(50);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isBuy = activeTab === "buy";
   const price = parseFloat(offer.price);
   const pay = parseFloat(payAmount) || 600;
@@ -754,17 +761,35 @@ const OrderPage = ({
     return () => clearInterval(timer);
   }, [orderStep]);
 
-  // Auto-transition from coin_release to success
+  // 5-min release countdown
   useEffect(() => {
-    if (orderStep === "coin_release") {
-      const t = setTimeout(() => setOrderStep("success"), 3000);
-      return () => clearTimeout(t);
-    }
+    if (orderStep !== "pending_release") return;
+    const timer = setInterval(() => {
+      setReleaseSec(s => {
+        if (s === 0) {
+          setReleaseMin(m => Math.max(0, m - 1));
+          return 59;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
   }, [orderStep]);
+
+  // Auto-trigger seller release pop-up after a short wait
+  useEffect(() => {
+    if (orderStep !== "pending_release") return;
+    const t = setTimeout(() => {
+      setExtraMessages(prev => [...prev, { from: "system", text: "The seller has released the coins you've just purchased. Please head to your Funding Account to view.", ts: dateStr, kind: "info" }]);
+      setShowCompletedPopup(true);
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [orderStep, dateStr]);
 
   const handlePaymentConfirmed = () => {
     setShowConfirmPayment(false);
-    setOrderStep("coin_release");
+    setOrderStep("pending_release");
+    setExtraMessages(prev => [...prev, { from: "system", text: "You've completed the payment. Please wait for the seller to release the coins to you.", ts: dateStr, kind: "info" }]);
   };
 
   const handleDisputeSubmit = () => {
@@ -772,21 +797,14 @@ const OrderPage = ({
     setOrderStep("disputed");
   };
 
-  // Show success screen
-  if (orderStep === "success") {
-    return (
-      <TradeSuccessScreen
-        offer={offer}
-        activeTab={activeTab}
-        selectedCrypto={selectedCrypto}
-        quantity={quantity}
-        payAmount={pay.toFixed(2)}
-        onClose={onClose}
-      />
-    );
-  }
+  const handleFileAttach = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setExtraMessages(prev => [...prev, { from: "buyer", text: `📎 ${file.name}`, ts: dateStr, kind: "file" }]);
+    e.target.value = "";
+  };
 
-  const stepIndex = orderStep === "pending_payment" ? 1 : orderStep === "coin_release" ? 2 : orderStep === "disputed" ? 2 : 3;
+  const stepIndex = orderStep === "pending_payment" ? 1 : orderStep === "pending_release" ? 2 : orderStep === "disputed" ? 2 : 3;
 
   return (
     <div className="fixed inset-0 z-[90] bg-background overflow-y-auto">
@@ -806,10 +824,17 @@ const OrderPage = ({
       )}
       {showDispute && (
         <DisputeModal
-          offer={offer}
-          orderId={orderId}
           onClose={() => setShowDispute(false)}
           onSubmit={handleDisputeSubmit}
+        />
+      )}
+      {showCompletedPopup && (
+        <OrderCompletedPopup
+          fiatAmount={pay.toFixed(2)}
+          fiat={offer.currency}
+          quantity={quantity}
+          selectedCrypto={selectedCrypto}
+          onClose={() => { setShowCompletedPopup(false); setOrderStep("completed_review"); }}
         />
       )}
       <div className="max-w-7xl mx-auto px-6 py-6">
