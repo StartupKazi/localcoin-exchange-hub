@@ -19,6 +19,7 @@ import Support from "./pages/Support.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Profile from "./pages/Profile.tsx";
 import Kyc from "./pages/Kyc.tsx";
+import Notifications from "./pages/Notifications.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { ActiveUsers, EmailUnverified, MobileUnverified, BannedUsers, KycUnverified, KycPending, AllUsers } from "./pages/admin/users/UserPages";
 import NotificationToAll from "./pages/admin/users/NotificationToAll";
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/support" element={<Support />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/kyc" element={<Kyc />} />
+          <Route path="/notifications" element={<Notifications />} />
 
           {/* Auth */}
           <Route path="/login" element={<UserLogin />} />
