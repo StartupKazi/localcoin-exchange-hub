@@ -720,6 +720,534 @@ type OrderStep =
   | "disputed";
 type ChatMsg = { from: "system" | "buyer" | "seller"; text: string; ts: string; kind?: "text" | "file" | "info" };
 
+// ─── Mobile Order Flow (Bybit-style) ────────────────────────────────
+type MobileFlowProps = {
+  offer: TradeOffer;
+  selectedCrypto: string;
+  pay: number;
+  quantity: string;
+  orderId: string;
+  dateStr: string;
+  minutes: number;
+  seconds: number;
+  releaseMin: number;
+  releaseSec: number;
+  orderStep: OrderStep;
+  setOrderStep: (s: OrderStep) => void;
+  disputeReason: string;
+  setDisputeReason: (r: string) => void;
+  proofFiles: File[];
+  setProofFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  showAppealDetails: boolean;
+  setShowAppealDetails: (v: boolean) => void;
+  rating: "good" | "bad" | null;
+  setRating: (r: "good" | "bad") => void;
+  onShowConfirmPayment: () => void;
+  onShowCancelOrder: () => void;
+  onClose: () => void;
+};
+
+const MobileProgressBar = ({ step }: { step: 1 | 2 | 3 }) => (
+  <div className="flex gap-1.5 mb-4">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
+    ))}
+  </div>
+);
+
+const SellerPill = ({ merchant }: { merchant: string }) => (
+  <div className="flex items-center justify-between bg-muted/30 rounded-full pl-4 pr-1 py-1 mb-5">
+    <div className="flex items-center gap-1 text-sm font-medium text-foreground min-w-0">
+      <span className="truncate">{merchant}</span>
+      <span className="text-base">🛡️</span>
+      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    </div>
+    <button className="bg-primary text-primary-foreground text-sm font-semibold rounded-full px-5 py-2">
+      Contact Seller
+    </button>
+  </div>
+);
+
+const CopyRow = ({ label, value, valueClass = "" }: { label: string; value: string; valueClass?: string }) => (
+  <div className="flex items-center justify-between py-2.5">
+    <span className="text-sm text-muted-foreground">{label}</span>
+    <div className="flex items-center gap-1.5">
+      <span className={`text-sm font-semibold text-foreground ${valueClass}`}>{value}</span>
+      <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+    </div>
+  </div>
+);
+
+const MobileOrderFlow = (p: MobileFlowProps) => {
+  const reasons = [
+    "I've completed my payment but the counterparty hasn't released the coins",
+    "I have paid more than the required amount",
+    "Counterparty requested payment to an account that mismatched with the verified name, and I have completed the payment",
+    "Counterparty requested additional payment (excluding transaction fees), and I have completed the payment.",
+    "I have paid to the wrong account",
+    "Counterparty engaged in fraudulent behavior, and I have completed the payment",
+    "Counterparty insulted me, and I do not wish to continue this trade",
+    "Other order dispute issues",
+  ];
+
+  const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const list = Array.from(e.target.files || []);
+    p.setProofFiles((prev) => [...prev, ...list].slice(0, 4));
+    e.target.value = "";
+  };
+
+  if (p.orderStep === "get_help") {
+    return (
+      <div className="flex flex-col min-h-screen pb-24">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={() => p.setOrderStep("pending_payment")} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-base font-semibold text-foreground">Get Help</h1>
+          <span className="w-6" />
+        </div>
+        <div className="px-4 flex-1">
+          <p className="text-sm text-muted-foreground mb-3">Try to resolve the issue by following these steps:</p>
+          <div className="bg-muted/30 rounded-xl p-5 space-y-5">
+            {[
+              "Ensure you have paid the order amount using the seller's accepted payment method.",
+              "Please allow the seller some time to verify your payment, as the payment provider may take a while to process it.",
+              "Communicate with the seller and provide your payment proof for verification.",
+              "Rest assured the crypto amount for this order is locked until the coin is released.",
+            ].map((t, i, arr) => (
+              <div key={i} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-3 h-3 rounded-full border-2 border-primary bg-background" />
+                  {i < arr.length - 1 && <div className="w-px flex-1 border-l border-dashed border-border mt-1" />}
+                </div>
+                <p className="text-sm text-foreground/80 flex-1 pb-1">{t}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            Please wait patiently for our assistance after you submit an appeal. Cancelling the order hastily may result in asset loss.
+          </p>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3 flex flex-col gap-2">
+          <button onClick={() => p.setOrderStep("dispute_select")} className="w-full py-3 rounded-full border border-border text-foreground text-sm font-semibold">
+            Submit Appeal
+          </button>
+          <button className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            Contact Seller
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (p.orderStep === "dispute_select") {
+    return (
+      <div className="flex flex-col min-h-screen pb-24">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={() => p.setOrderStep("pending_release")} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-base font-semibold text-foreground">Order Dispute</h1>
+          <span className="w-6" />
+        </div>
+        <div className="px-4 flex-1">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-start gap-2 mb-4">
+            <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-foreground">Be assured that LocalCoin Trade places the Seller's crypto assets in escrow for all uncompleted orders.</p>
+          </div>
+          <div className="bg-muted/30 rounded-xl p-4 mb-5">
+            <p className="text-sm text-foreground mb-2">Before making an appeal, please attempt to resolve the issue with your counterparty.</p>
+            <button className="text-sm text-primary font-medium flex items-center gap-1.5">
+              <MessageCircle className="h-4 w-4" /> Contact Seller
+            </button>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">What's the issue?</p>
+          <div className="space-y-3 mb-5">
+            {reasons.map((r) => (
+              <label key={r} onClick={() => p.setDisputeReason(r)} className="flex items-start gap-3 cursor-pointer">
+                <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${p.disputeReason === r ? "border-primary" : "border-border"}`}>
+                  {p.disputeReason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <span className="text-sm text-foreground leading-snug">{r}</span>
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            If there is no financial dispute over the order but you would like to report your counterparty's violation, please use the "Report User" button.
+            <span className="text-primary font-medium ml-1">Report User</span>
+          </p>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3">
+          <button
+            disabled={!p.disputeReason}
+            onClick={() => p.setShowAppealDetails(true)}
+            className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+
+        {p.showAppealDetails && (
+          <div className="fixed inset-0 z-[120] bg-black/40 flex items-end" onClick={() => p.setShowAppealDetails(false)}>
+            <div className="w-full bg-card rounded-t-2xl p-5 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-foreground">Appeal Details:</h3>
+                <button onClick={() => p.setShowAppealDetails(false)}><X className="h-5 w-5 text-muted-foreground" /></button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">Please select according to the real situation.</p>
+              <div className="border border-border rounded-xl p-4 space-y-4">
+                {[
+                  "Did you make the payment using your verified-name account?",
+                  "Did you make the payment in a single transaction?",
+                  "Is the current transaction status completed (i.e., not pending or delayed)?",
+                ].map((q) => (
+                  <div key={q}>
+                    <p className="text-sm text-foreground mb-2">{q}</p>
+                    <div className="flex gap-6">
+                      {["Yes", "No"].map((opt) => (
+                        <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                          <div className="w-4 h-4 rounded-full border-2 border-primary flex items-center justify-center">
+                            {opt === "Yes" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                          </div>
+                          <span className="text-sm text-foreground">{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-4 mb-5">
+                Answering the questions above would help us to understand more about the disputed situation, so that we could better assist you.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => { p.setShowAppealDetails(false); p.setOrderStep("upload_proof"); }}
+                  className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold"
+                >
+                  Get Help
+                </button>
+                <button onClick={() => p.setShowAppealDetails(false)} className="w-full py-3 rounded-full border border-border text-foreground text-sm font-semibold">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (p.orderStep === "upload_proof") {
+    const stages = ["Appeal Submitted", "Mutual Negotiation", "Appeal in Progress", "Appeal Ended"];
+    return (
+      <div className="flex flex-col min-h-screen pb-24">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={() => p.setOrderStep("dispute_select")} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-base font-semibold text-foreground">Upload Proof</h1>
+          <span className="w-6" />
+        </div>
+        <div className="px-4 flex-1">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-start gap-2 mb-5">
+            <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-foreground">Any malicious appeal requests may result in your account being suspended.</p>
+          </div>
+
+          <div className="flex items-start justify-between mb-6 px-1">
+            {stages.map((s, i) => (
+              <div key={s} className="flex flex-col items-center flex-1 relative">
+                {i < stages.length - 1 && (
+                  <div className="absolute top-3 left-1/2 w-full h-px bg-border" />
+                )}
+                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center relative z-10">
+                  {i + 1}
+                </div>
+                <span className="text-[11px] text-foreground text-center mt-1.5 leading-tight">{s}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-sm text-muted-foreground mb-1">Reason for appeal:</p>
+          <p className="text-sm font-semibold text-foreground mb-5">{p.disputeReason || "—"}</p>
+
+          <p className="text-sm text-muted-foreground mb-3">Proof Document(s)<span className="text-foreground">(Required)</span></p>
+          <div className="flex flex-wrap gap-3 mb-3">
+            {p.proofFiles.map((f, i) => (
+              <div key={i} className="w-20 h-20 rounded-lg bg-muted/40 border border-border text-[10px] text-muted-foreground flex items-center justify-center text-center px-1 break-words">
+                {f.name.length > 18 ? f.name.slice(0, 16) + "…" : f.name}
+              </div>
+            ))}
+            {p.proofFiles.length < 4 && (
+              <label className="w-20 h-20 rounded-lg bg-muted/30 border border-dashed border-border flex items-center justify-center cursor-pointer">
+                <Plus className="h-6 w-6 text-muted-foreground" />
+                <input type="file" multiple accept="image/*,video/mp4,application/pdf" hidden onChange={handleProofChange} />
+              </label>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mb-1">Upload up to 4 files. Images, videos and PDFs are supported.</p>
+          <p className="text-xs text-muted-foreground mb-5">File upload limit: 100MB</p>
+
+          <div className="bg-muted/30 rounded-xl p-4 mb-4">
+            <p className="text-sm font-semibold text-foreground mb-3">Submit video proof in .mp4 or .pdf format only. Refer to the proof guidelines below:</p>
+            {[
+              { t: "Step 1", d: "Login process: Log in to your bank account" },
+              { t: "Step 2", d: "Account details page: Including your name and account number used in this P2P order" },
+              { t: "Step 3", d: "Transaction details: Including amount paid, beneficiary account number and name as well as date and time related to this P2P order" },
+            ].map((s, i, arr) => (
+              <div key={s.t} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-2.5 h-2.5 rounded-full border-2 border-primary bg-background mt-1" />
+                  {i < arr.length - 1 && <div className="w-px flex-1 border-l border-dashed border-border" />}
+                </div>
+                <div className="pb-3 flex-1">
+                  <p className="text-sm font-semibold text-primary">{s.t}</p>
+                  <p className="text-xs text-foreground/80 mt-0.5">{s.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button className="text-sm text-primary font-medium flex items-center gap-1 mb-2">
+            Video Upload Guide for Different Devices <ChevronRight className="h-4 w-4" />
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Please be aware that providing false proof could lead to the suspension of your account.
+          </p>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3">
+          <button
+            disabled={p.proofFiles.length === 0}
+            onClick={() => p.setOrderStep("disputed")}
+            className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40"
+          >
+            Submit Appeal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (p.orderStep === "pending_release") {
+    return (
+      <div className="flex flex-col min-h-screen pb-28">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={p.onClose} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <button className="text-sm text-foreground">Cancel Order</button>
+        </div>
+        <div className="px-4">
+          <MobileProgressBar step={2} />
+          <h1 className="text-2xl font-bold text-foreground mb-1">The coins will be released in</h1>
+          <p className="text-sm text-muted-foreground mb-4">
+            Coin Release in Progress <span className="text-primary font-semibold">{String(p.releaseMin).padStart(2, "0")}:{String(p.releaseSec).padStart(2, "0")}</span>
+          </p>
+          <SellerPill merchant={p.offer.merchant} />
+
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
+              <Bitcoin className="h-4 w-4 text-success" />
+            </div>
+            <span className="text-base font-semibold text-foreground">Buy {p.selectedCrypto}</span>
+          </div>
+
+          <div className="space-y-0.5 divide-y divide-border/30">
+            <CopyRow label="Amount" value={`${p.pay.toFixed(2)} ${p.offer.currency}`} />
+            <CopyRow label="Price" value={`${p.offer.price} ${p.offer.currency}`} />
+            <CopyRow label="Total Quantity" value={`${p.quantity} ${p.selectedCrypto}`} />
+            <CopyRow label="Transaction Fees" value={`0 ${p.selectedCrypto}`} />
+            <CopyRow label="Order No." value={p.orderId.slice(0, 19)} />
+            <CopyRow label="Order Time" value={p.dateStr} />
+          </div>
+          <div className="border-t border-border/30 mt-3 pt-3 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Payment Method</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="w-0.5 h-4 bg-success rounded-full" />
+            <span className="text-sm font-semibold text-foreground">{p.offer.paymentMethods[0]}</span>
+          </div>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3 flex gap-3">
+          <button
+            onClick={() => p.setOrderStep("dispute_select")}
+            className="flex-1 py-3 rounded-full border border-border text-foreground text-sm font-semibold"
+          >
+            Order Dispute?
+          </button>
+          <button className="flex-1 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            Reminder
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (p.orderStep === "disputed") {
+    return (
+      <div className="flex flex-col min-h-screen pb-24">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={p.onClose} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-base font-semibold text-foreground">Appeal Submitted</h1>
+          <span className="w-6" />
+        </div>
+        <div className="px-4 flex-1 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Flag className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-lg font-bold text-foreground mb-2">Your appeal is under review</h2>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            A moderator will review the evidence from both parties. Funds remain locked in escrow until the dispute is resolved.
+          </p>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3">
+          <button onClick={p.onClose} className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            Back to P2P
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (p.orderStep === "completed_review") {
+    return (
+      <div className="flex flex-col min-h-screen pb-24">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <button onClick={p.onClose} className="p-1 -ml-1">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-base font-semibold text-foreground">Order completed</h1>
+          <span className="w-6" />
+        </div>
+        <div className="px-4 flex-1">
+          <p className="text-sm text-muted-foreground mb-4">
+            This order has concluded, and the assets are no longer locked by LocalCoin Trade.
+          </p>
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mb-4 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-foreground">
+              The coin you purchased has been credited to your Funding Account. However, you may not be able to withdraw or sell it immediately due to the security protection period.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
+              <Bitcoin className="h-4 w-4 text-success" />
+            </div>
+            <span className="text-base font-semibold text-foreground">Buy {p.selectedCrypto}</span>
+          </div>
+          <div className="space-y-0.5 divide-y divide-border/30 mb-4">
+            <CopyRow label="Fiat Amount" value={`${p.pay.toFixed(2)} ${p.offer.currency}`} valueClass="text-success" />
+            <CopyRow label="Price" value={`${p.offer.price} ${p.offer.currency}`} />
+            <CopyRow label="Receive quantity" value={`${p.quantity} ${p.selectedCrypto}`} />
+            <CopyRow label="Order No." value={p.orderId.slice(0, 19)} />
+            <CopyRow label="Order Time" value={p.dateStr} />
+            <CopyRow label="Payment Method" value={p.offer.paymentMethods[0]} />
+          </div>
+
+          <div className="border border-border rounded-xl p-4">
+            <h4 className="text-base font-bold text-foreground mb-1">Review</h4>
+            {p.rating ? (
+              <p className="text-sm text-success">Thanks for your feedback!</p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground mb-3">How was your experience with this seller?</p>
+                <div className="flex gap-3">
+                  <button onClick={() => p.setRating("good")} className="flex-1 py-3 rounded-xl border border-border flex items-center justify-center gap-2">
+                    <ThumbsUp className="h-5 w-5" /> <span className="font-semibold">Good</span>
+                  </button>
+                  <button onClick={() => p.setRating("bad")} className="flex-1 py-3 rounded-xl border border-border flex items-center justify-center gap-2">
+                    <ThumbsDown className="h-5 w-5" /> <span className="font-semibold">Bad</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3">
+          <button onClick={p.onClose} className="w-full py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            Back to P2P
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Default: Pending for Payment
+  return (
+    <div className="flex flex-col min-h-screen pb-32">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <button onClick={p.onClose} className="p-1 -ml-1">
+          <ArrowLeft className="h-5 w-5 text-foreground" />
+        </button>
+        <button onClick={p.onShowCancelOrder} className="text-sm text-foreground">Cancel Order</button>
+      </div>
+      <div className="px-4">
+        <MobileProgressBar step={1} />
+        <h1 className="text-2xl font-bold text-foreground mb-1">Pending for Payment</h1>
+        <p className="text-sm text-destructive mb-5">
+          Note: The order will be automatically canceled if the button is not clicked by the deadline.{" "}
+          <span className="font-semibold">{String(p.minutes).padStart(2, "0")}:{String(p.seconds).padStart(2, "0")}</span>
+        </p>
+        <SellerPill merchant={p.offer.merchant} />
+
+        <div className="flex gap-3 mb-3">
+          <div className="w-6 h-6 rounded-full border-2 border-foreground flex items-center justify-center text-xs font-bold text-foreground shrink-0">1</div>
+          <h3 className="text-base font-semibold text-foreground">Transfer via {p.offer.paymentMethods[0]}</h3>
+        </div>
+        <div className="ml-9 border-l border-border pl-4 pb-5">
+          <div className="space-y-0 divide-y divide-border/30">
+            <CopyRow label="Fiat Amount" value={`${p.pay.toFixed(2)} ${p.offer.currency}`} valueClass="text-success" />
+            <CopyRow label="Name" value="WILLIAM MWANGI WACHIRA" />
+            <CopyRow label="Account Number/Card No" value="02305140556150" />
+            <CopyRow label="Paybill Number" value="542542" />
+            <CopyRow label="Order No." value={p.orderId.slice(0, 19)} />
+          </div>
+          <button className="text-sm text-muted-foreground flex items-center gap-1 mt-3">
+            Order details <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+          <p className="text-xs text-muted-foreground mt-3">
+            Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.
+          </p>
+        </div>
+
+        <div className="flex gap-3 mb-5">
+          <div className="w-6 h-6 rounded-full border-2 border-foreground flex items-center justify-center text-xs font-bold text-foreground shrink-0">2</div>
+          <h3 className="text-base font-semibold text-foreground">After payment, click the button below so the seller can release the crypto.</h3>
+        </div>
+
+        <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside leading-relaxed pb-6">
+          <li>Always use a payment account that matches your verified name.</li>
+          <li>Do not split the payment into multiple transactions, even if requested by the seller.</li>
+          <li>Real-time payment is strongly recommended.</li>
+          <li>Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.</li>
+          <li>Failure to comply with the above may result in payment loss or account restrictions.</li>
+          <li>No bargaining after you place an order. The transaction must follow the order details exactly.</li>
+        </ol>
+      </div>
+
+      <div className="fixed bottom-0 inset-x-0 bg-background border-t border-border/40 p-3 space-y-2">
+        <button
+          onClick={() => p.setOrderStep("get_help")}
+          className="w-full py-2.5 rounded-full bg-muted/40 text-foreground text-sm font-medium flex items-center justify-center gap-2"
+        >
+          <Lightbulb className="h-4 w-4 text-primary" />
+          Encountered an Issue? <ChevronRight className="h-4 w-4" />
+        </button>
+        <button
+          onClick={p.onShowConfirmPayment}
+          className="w-full py-3 rounded-full bg-primary text-primary-foreground text-base font-semibold"
+        >
+          Payment Completed
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── Order Page (full-page, replaces dashboard) ─────────────────────
 const OrderPage = ({
   offer,
   activeTab,
