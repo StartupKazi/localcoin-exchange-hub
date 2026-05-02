@@ -1006,7 +1006,7 @@ const OrderPage = ({
                     {orderStep === "disputed" ? "!" : stepIndex > 2 ? "✓" : "2"}
                   </span>
                   <span className={`text-sm ${stepIndex >= 2 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-                    {orderStep === "disputed" ? "Dispute Filed" : "Coin Release in Progress"}
+                    {orderStep === "disputed" ? "Dispute Filed" : "Pending for Release"}
                   </span>
                 </div>
                 <div className="flex-1 mx-4 h-px bg-border relative">
