@@ -91,10 +91,33 @@ const testimonials = [
 const Home = () => {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [crypto, setCrypto] = useState("BTC");
-  const [payment, setPayment] = useState("Bank Transfer");
-  const [fiat, setFiat] = useState("USD");
-  const [region, setRegion] = useState("Worldwide");
+
+  // One-Click Buy widget state
+  const [ocbTab, setOcbTab] = useState<"buy" | "sell">("buy");
+  const [ocbCrypto, setOcbCrypto] = useState("BTC");
+  const [ocbFiat, setOcbFiat] = useState("KES");
+  const [ocbSpend, setOcbSpend] = useState("");
+  const [ocbReceive, setOcbReceive] = useState("");
+  const [ocbPayment, setOcbPayment] = useState("bank");
+  const [showOcbCrypto, setShowOcbCrypto] = useState(false);
+  const [showOcbFiat, setShowOcbFiat] = useState(false);
+  const [showOcbPayment, setShowOcbPayment] = useState(false);
+
+  const ocbIsBuy = ocbTab === "buy";
+  const ocbRate = ocbRates[ocbCrypto]?.[ocbFiat] || 1;
+  const ocbExchange = ocbRate.toLocaleString();
+  const ocbCurrentPayment = ocbPaymentMethods.find((p) => p.id === ocbPayment)!;
+
+  const handleOcbSpendChange = (val: string) => {
+    setOcbSpend(val);
+    const num = parseFloat(val.replace(/,/g, ""));
+    if (!isNaN(num) && num > 0) {
+      const result = ocbIsBuy ? num / ocbRate : num * ocbRate;
+      setOcbReceive(result < 0.0001 ? result.toFixed(8) : result.toLocaleString(undefined, { maximumFractionDigits: 6 }));
+    } else {
+      setOcbReceive("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-16 md:pb-0">
