@@ -252,9 +252,9 @@ export const TradeDialog = ({
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[720px] flex">
-        {/* Left – Merchant Info */}
-        <div className="w-[340px] p-6 border-r border-border/30">
+      <div className="w-full md:w-[720px] flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
+        {/* Top (mobile) / Left (desktop) – Merchant Info */}
+        <div className="w-full md:w-[340px] p-4 md:p-6 border-b md:border-b-0 md:border-r border-border/30">
           <div className="flex items-center gap-3 mb-1">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
               {offer.merchant[0]}
@@ -317,8 +317,8 @@ export const TradeDialog = ({
           </div>
         </div>
 
-        {/* Right – Order Form */}
-        <div className="flex-1 p-6">
+        {/* Bottom (mobile) / Right (desktop) – Order Form */}
+        <div className="flex-1 p-4 md:p-6">
           <div className="flex items-baseline gap-2 mb-6">
             <span className="text-sm text-muted-foreground">Price</span>
             <span className="text-xl font-bold text-primary">{offer.price} {offer.currency}</span>
