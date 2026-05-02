@@ -873,15 +873,6 @@ const OrderPage = ({
                     </p>
                   </div>
                   <p className="text-base font-semibold mb-4"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-foreground mb-1">After payment, click the button below so the seller can release the crypto.</p>
-                        <p className="text-xs text-muted-foreground">Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.</p>
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
 
