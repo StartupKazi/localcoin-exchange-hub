@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { X, Shield, CheckCircle, AlertCircle, FileText, Smartphone, ChevronRight, ChevronDown, Copy, Send, Plus, AlertTriangle, PartyPopper, Lock, Flag, Clock, ArrowRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, Shield, CheckCircle, AlertCircle, FileText, Smartphone, ChevronRight, ChevronDown, Copy, Send, Plus, AlertTriangle, PartyPopper, Lock, Flag, Clock, ArrowRight, ThumbsUp, ThumbsDown, MessageCircle, Bitcoin, TrendingUp, Paperclip } from "lucide-react";
 
 type TradeOffer = {
   id: number;
@@ -526,79 +526,80 @@ const TradeSuccessScreen = ({
   );
 };
 
-// ─── Dispute Modal ───────────────────────────────────────────────────
+// ─── Dispute Modal (2-panel wizard) ──────────────────────────────────
 const DisputeModal = ({
-  offer,
-  orderId,
   onClose,
   onSubmit,
 }: {
-  offer: TradeOffer;
-  orderId: string;
   onClose: () => void;
   onSubmit: () => void;
 }) => {
   const [reason, setReason] = useState("");
-  const [details, setDetails] = useState("");
+  const [step, setStep] = useState<"select" | "confirm">("select");
+
   const reasons = [
-    "I have paid but the seller has not released the coins",
-    "The seller is unresponsive",
-    "The payment details provided are incorrect",
-    "I suspect fraudulent activity",
-    "Other",
+    "I've completed my payment but the counterparty hasn't released the coins",
+    "I have paid more than the required amount",
+    "Counterparty requested payment to an account that mismatched with the verified name, and I have completed the payment",
+    "Counterparty requested additional payment (excluding transaction fees), and I have completed the payment.",
+    "I have paid to the wrong account",
+    "Counterparty engaged in fraudulent behavior, and I have completed the payment",
+    "Counterparty insulted me, and I do not wish to continue this trade",
+    "Other order dispute issues",
   ];
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[520px] p-6">
+      <div className="w-[560px] max-h-[85vh] overflow-y-auto p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Flag className="h-5 w-5 text-destructive" /> File a Dispute
-          </h2>
+          <h2 className="text-lg font-bold text-foreground">Order Dispute</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-xs text-foreground mb-5 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-          <span>Filing a dispute will freeze the escrowed funds until a resolution is reached. Please provide accurate information to help us resolve the issue quickly.</span>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-sm text-muted-foreground mb-1">Order ID</p>
-          <p className="text-sm font-mono text-foreground">{orderId.slice(0, 19)}</p>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-sm font-medium text-foreground mb-3">Select a reason for the dispute:</p>
-          <div className="space-y-2 border border-border rounded-xl p-3">
-            {reasons.map(r => (
-              <label key={r} className="flex items-start gap-3 cursor-pointer py-1.5">
-                <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${reason === r ? "border-primary" : "border-border"}`}>
-                  {reason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
-                </div>
-                <span className="text-sm text-foreground">{r}</span>
-              </label>
-            ))}
+        {step === "select" && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-foreground mb-4 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <span>Be assured that LocalCoin Trade places the Seller's crypto assets in escrow for all uncompleted orders.</span>
           </div>
+        )}
+
+        <div className="bg-muted/30 rounded-xl p-4 mb-5">
+          <p className="text-sm text-foreground mb-2">Before making an appeal, please attempt to resolve the issue with your counterparty.</p>
+          <button className="text-sm text-primary font-medium flex items-center gap-1.5">
+            <MessageCircle className="h-4 w-4" /> Contact now
+          </button>
         </div>
 
-        <div className="mb-6">
-          <label className="text-sm font-medium text-foreground mb-2 block">Additional Details</label>
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            placeholder="Describe the issue in detail..."
-            className="w-full border border-border rounded-xl p-3 text-sm text-foreground bg-transparent outline-none resize-none h-24 placeholder:text-muted-foreground focus:border-primary"
-          />
+        <p className="text-sm text-muted-foreground mb-3">What's the issue?</p>
+        <div className="space-y-3 mb-5">
+          {reasons.map((r) => (
+            <label key={r} className="flex items-start gap-3 cursor-pointer">
+              <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${reason === r ? "border-primary" : "border-border"}`}>
+                {reason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
+              </div>
+              <span className="text-sm text-foreground leading-snug">{r}</span>
+            </label>
+          ))}
         </div>
+
+        {step === "confirm" && (
+          <p className="text-xs text-muted-foreground mb-5">
+            If there is no financial dispute over the order but you would like to report your counterparty's violation, please use the "Report User" button.
+            <span className="text-primary font-medium ml-1 cursor-pointer">Report User</span>
+          </p>
+        )}
 
         <div className="flex gap-3">
           <button
-            onClick={onSubmit}
+            onClick={() => {
+              if (!reason) return;
+              if (step === "select") setStep("confirm");
+              else onSubmit();
+            }}
             disabled={!reason}
-            className="flex-1 py-3 rounded-full bg-destructive text-white text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Submit Dispute
+            {step === "select" ? "Next" : "Submit Dispute"}
           </button>
           <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">
             Cancel
@@ -608,6 +609,70 @@ const DisputeModal = ({
     </Overlay>
   );
 };
+
+// ─── Order Completed Pop-up ──────────────────────────────────────────
+const OrderCompletedPopup = ({
+  fiatAmount,
+  fiat,
+  quantity,
+  selectedCrypto,
+  onClose,
+}: {
+  fiatAmount: string;
+  fiat: string;
+  quantity: string;
+  selectedCrypto: string;
+  onClose: () => void;
+}) => (
+  <Overlay onClose={onClose}>
+    <div className="w-[480px] p-8 relative">
+      <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-success/10 border-2 border-success flex items-center justify-center">
+          <CheckCircle className="h-12 w-12 text-success" />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{fiatAmount} {fiat}</h2>
+        <p className="text-sm text-muted-foreground">Congrats, you've bought <span className="font-semibold text-foreground">{quantity} {selectedCrypto}</span>!</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <button onClick={onClose} className="py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-muted/30 transition-colors">
+          View Order
+        </button>
+        <button onClick={onClose} className="py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-muted/30 transition-colors">
+          View My Assets
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="bg-muted/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <Bitcoin className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Explore Spot X on LocalCoin Trade</p>
+            <p className="text-xs text-muted-foreground">Unlock new crypto opportunities and earn rewards!</p>
+          </div>
+          <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1">
+            Trade <ArrowRight className="h-3 w-3" />
+          </button>
+        </div>
+        <div className="bg-muted/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <TrendingUp className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Derivatives</p>
+            <p className="text-xs text-muted-foreground">Upgrade your trades with USDT Perpetual, Inverse Futures, and more.</p>
+          </div>
+          <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1">
+            Trade <ArrowRight className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </Overlay>
+);
 
 // ─── Escrow Status Banner ────────────────────────────────────────────
 const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" | "releasing" | "disputed"; selectedCrypto: string; quantity: string }) => {
@@ -645,7 +710,8 @@ const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" |
 };
 
 // ─── Order Page (full-page, replaces dashboard) ─────────────────────
-type OrderStep = "pending_payment" | "coin_release" | "success" | "disputed";
+type OrderStep = "pending_payment" | "pending_release" | "completed_review" | "disputed";
+type ChatMsg = { from: "system" | "buyer" | "seller"; text: string; ts: string; kind?: "text" | "file" | "info" };
 
 const OrderPage = ({
   offer,
@@ -664,9 +730,15 @@ const OrderPage = ({
   const [showConfirmPayment, setShowConfirmPayment] = useState(false);
   const [showCancelOrder, setShowCancelOrder] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
+  const [showCompletedPopup, setShowCompletedPopup] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
+  const [extraMessages, setExtraMessages] = useState<ChatMsg[]>([]);
+  const [rating, setRating] = useState<"good" | "bad" | null>(null);
   const [minutes, setMinutes] = useState(14);
-  const [seconds, setSeconds] = useState(59);
+  const [seconds, setSeconds] = useState(50);
+  const [releaseMin, setReleaseMin] = useState(4);
+  const [releaseSec, setReleaseSec] = useState(50);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isBuy = activeTab === "buy";
   const price = parseFloat(offer.price);
   const pay = parseFloat(payAmount) || 600;
@@ -689,17 +761,35 @@ const OrderPage = ({
     return () => clearInterval(timer);
   }, [orderStep]);
 
-  // Auto-transition from coin_release to success
+  // 5-min release countdown
   useEffect(() => {
-    if (orderStep === "coin_release") {
-      const t = setTimeout(() => setOrderStep("success"), 3000);
-      return () => clearTimeout(t);
-    }
+    if (orderStep !== "pending_release") return;
+    const timer = setInterval(() => {
+      setReleaseSec(s => {
+        if (s === 0) {
+          setReleaseMin(m => Math.max(0, m - 1));
+          return 59;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
   }, [orderStep]);
+
+  // Auto-trigger seller release pop-up after a short wait
+  useEffect(() => {
+    if (orderStep !== "pending_release") return;
+    const t = setTimeout(() => {
+      setExtraMessages(prev => [...prev, { from: "system", text: "The seller has released the coins you've just purchased. Please head to your Funding Account to view.", ts: dateStr, kind: "info" }]);
+      setShowCompletedPopup(true);
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [orderStep, dateStr]);
 
   const handlePaymentConfirmed = () => {
     setShowConfirmPayment(false);
-    setOrderStep("coin_release");
+    setOrderStep("pending_release");
+    setExtraMessages(prev => [...prev, { from: "system", text: "You've completed the payment. Please wait for the seller to release the coins to you.", ts: dateStr, kind: "info" }]);
   };
 
   const handleDisputeSubmit = () => {
@@ -707,21 +797,14 @@ const OrderPage = ({
     setOrderStep("disputed");
   };
 
-  // Show success screen
-  if (orderStep === "success") {
-    return (
-      <TradeSuccessScreen
-        offer={offer}
-        activeTab={activeTab}
-        selectedCrypto={selectedCrypto}
-        quantity={quantity}
-        payAmount={pay.toFixed(2)}
-        onClose={onClose}
-      />
-    );
-  }
+  const handleFileAttach = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setExtraMessages(prev => [...prev, { from: "buyer", text: `📎 ${file.name}`, ts: dateStr, kind: "file" }]);
+    e.target.value = "";
+  };
 
-  const stepIndex = orderStep === "pending_payment" ? 1 : orderStep === "coin_release" ? 2 : orderStep === "disputed" ? 2 : 3;
+  const stepIndex = orderStep === "pending_payment" ? 1 : orderStep === "pending_release" ? 2 : orderStep === "disputed" ? 2 : 3;
 
   return (
     <div className="fixed inset-0 z-[90] bg-background overflow-y-auto">
@@ -741,10 +824,17 @@ const OrderPage = ({
       )}
       {showDispute && (
         <DisputeModal
-          offer={offer}
-          orderId={orderId}
           onClose={() => setShowDispute(false)}
           onSubmit={handleDisputeSubmit}
+        />
+      )}
+      {showCompletedPopup && (
+        <OrderCompletedPopup
+          fiatAmount={pay.toFixed(2)}
+          fiat={offer.currency}
+          quantity={quantity}
+          selectedCrypto={selectedCrypto}
+          onClose={() => { setShowCompletedPopup(false); setOrderStep("completed_review"); }}
         />
       )}
       <div className="max-w-7xl mx-auto px-6 py-6">
@@ -762,7 +852,7 @@ const OrderPage = ({
           <div className="flex-1">
             {/* Escrow Banner */}
             <EscrowBanner
-              status={orderStep === "disputed" ? "disputed" : orderStep === "coin_release" ? "releasing" : "locked"}
+              status={orderStep === "disputed" ? "disputed" : orderStep === "pending_release" ? "releasing" : "locked"}
               selectedCrypto={selectedCrypto}
               quantity={quantity}
             />
@@ -771,33 +861,118 @@ const OrderPage = ({
             <div className="bg-card rounded-xl border border-border/30 p-6 mb-6">
               {orderStep === "pending_payment" && (
                 <>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">⏱</span>
-                      <h3 className="text-lg font-semibold text-foreground">Complete Your Payment Within:</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Pending for Payment</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Note: The order will be automatically canceled if the button is not clicked by the deadline.{" "}
+                    <span className="font-bold text-primary">{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
+                  </p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      Make the payment according to the exact order details. Otherwise, you may incur asset loss or penalties for violating platform policy. The order will be canceled after the countdown timer ends.
+                    </p>
+                  </div>
+                  <p className="text-base font-semibold mb-4"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-foreground">Transfer via {offer.paymentMethods[0]}</span>
+                          <button className="text-xs text-primary border border-primary/30 rounded-full px-3 py-1 hover:bg-primary/5">● Have issues in trading?</button>
+                        </div>
+                        <div className="border border-border rounded-xl p-3 mb-3">
+                          <p className="text-xs"><span className="text-muted-foreground">Seller's name:</span> <span className="font-bold text-foreground">RACHAEL MUUSI KILONZI</span></p>
+                        </div>
+                        <div className="space-y-2 text-sm pl-3">
+                          <div className="flex justify-between"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success flex items-center gap-1">{pay.toFixed(2)} {offer.currency} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Name</span><span className="font-bold text-foreground flex items-center gap-1">RACHAEL MUUSI KILONZI <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Payment Details</span><span className="font-bold text-foreground flex items-center gap-1">0759810845 <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground flex items-center gap-1">{orderId.slice(0, 19)} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <button className="text-sm text-foreground flex items-center gap-1 mt-1">Order Details <ChevronDown className="h-3.5 w-3.5" /></button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(minutes).padStart(2, "0")}</span>
-                      <span className="text-xl font-bold text-foreground">:</span>
-                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(seconds).padStart(2, "0")}</span>
+                    <div className="flex gap-3">
+                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground mb-1">After payment, click the button below so the seller can release the crypto.</p>
+                        <p className="text-xs text-muted-foreground">Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.</p>
+                      </div>
                     </div>
                   </div>
-                  <ul className="text-sm text-muted-foreground space-y-2 mb-6 list-disc pl-5">
-                    <li>Please complete payment within the allowed timeframe.</li>
-                    <li>After making the payment, click "Payment Completed" below.</li>
-                    <li>The order will be automatically canceled if not confirmed by the deadline.</li>
-                  </ul>
                 </>
               )}
 
-              {orderStep === "coin_release" && (
-                <div className="text-center py-4">
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-                    <Clock className="h-6 w-6 text-primary" />
+              {orderStep === "pending_release" && (
+                <>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Pending for release</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    The coins you've bought will be released within{" "}
+                    <span className="font-bold text-primary">{String(releaseMin).padStart(2, "0")}:{String(releaseSec).padStart(2, "0")}</span>.
+                  </p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      Please do not cancel the order unless you have received the refund of your payment. Please cooperate with the refund if the seller rejects continuing to trade with you.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Coin Release in Progress</h3>
-                  <p className="text-sm text-muted-foreground">Payment confirmed. The seller is releasing {quantity} {selectedCrypto} to your wallet...</p>
-                </div>
+                  <p className="text-base font-semibold mb-3"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success">{pay.toFixed(2)} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Price</span><span className="font-bold text-foreground">{offer.price} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Receive quantity</span><span className="font-bold text-foreground">{quantity} {selectedCrypto}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground">{orderId.slice(0, 19)}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order Time</span><span className="font-bold text-foreground">{dateStr}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Payment Method</span><span className="font-bold text-foreground">{offer.paymentMethods[0]}</span></div>
+                  </div>
+                </>
+              )}
+
+              {orderStep === "completed_review" && (
+                <>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Order completed</h3>
+                  <p className="text-sm text-muted-foreground mb-4">This order has concluded, and the assets are no longer locked by LocalCoin Trade.</p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      The coin you purchased has been credited to your Funding Account. However, you may not be able to withdraw or sell it immediately due to the security protection period.
+                    </p>
+                  </div>
+                  <p className="text-base font-semibold mb-3"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success">{pay.toFixed(2)} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Price</span><span className="font-bold text-foreground">{offer.price} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Receive quantity</span><span className="font-bold text-foreground">{quantity} {selectedCrypto}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground">{orderId.slice(0, 19)}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order Time</span><span className="font-bold text-foreground">{dateStr}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Payment Method</span><span className="font-bold text-foreground">{offer.paymentMethods[0]}</span></div>
+                  </div>
+                  <div className="flex gap-5 mt-4 text-sm">
+                    <button onClick={() => setShowDispute(true)} className="text-foreground font-medium flex items-center gap-1">Order Dispute? <ChevronRight className="h-4 w-4" /></button>
+                    <button className="text-foreground font-medium flex items-center gap-1">View My Assets <ChevronRight className="h-4 w-4" /></button>
+                  </div>
+
+                  {/* Review */}
+                  <div className="mt-6 border border-border rounded-xl p-4">
+                    <h4 className="text-base font-bold text-foreground mb-1">Review</h4>
+                    {rating ? (
+                      <p className="text-sm text-success">Thanks for your feedback!</p>
+                    ) : (
+                      <>
+                        <p className="text-sm text-muted-foreground mb-3">How was your experience with this seller?</p>
+                        <div className="flex gap-3">
+                          <button onClick={() => setRating("good")} className="flex-1 py-3 rounded-xl border border-border hover:border-success hover:bg-success/5 flex items-center justify-center gap-2 transition-colors">
+                            <ThumbsUp className="h-5 w-5 text-foreground" /> <span className="font-semibold text-foreground">Good</span>
+                          </button>
+                          <button onClick={() => setRating("bad")} className="flex-1 py-3 rounded-xl border border-border hover:border-destructive hover:bg-destructive/5 flex items-center justify-center gap-2 transition-colors">
+                            <ThumbsDown className="h-5 w-5 text-foreground" /> <span className="font-semibold text-foreground">Bad</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
 
               {orderStep === "disputed" && (
@@ -815,6 +990,7 @@ const OrderPage = ({
               )}
 
               {/* 3-step progress */}
+              {orderStep !== "completed_review" && (
               <div className="flex items-center bg-muted/10 rounded-xl p-4 mt-4">
                 <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${stepIndex >= 1 ? "bg-success text-white" : "bg-muted text-muted-foreground"}`}>
@@ -830,7 +1006,7 @@ const OrderPage = ({
                     {orderStep === "disputed" ? "!" : stepIndex > 2 ? "✓" : "2"}
                   </span>
                   <span className={`text-sm ${stepIndex >= 2 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-                    {orderStep === "disputed" ? "Dispute Filed" : "Coin Release in Progress"}
+                    {orderStep === "disputed" ? "Dispute Filed" : "Pending for Release"}
                   </span>
                 </div>
                 <div className="flex-1 mx-4 h-px bg-border relative">
@@ -841,9 +1017,11 @@ const OrderPage = ({
                   <span className={`text-sm ${stepIndex >= 3 ? "text-foreground" : "text-muted-foreground"}`}>Transaction Completed</span>
                 </div>
               </div>
+              )}
             </div>
 
-            {/* Order Info */}
+            {/* Order Info – only during pending payment, since other stages already show details */}
+            {orderStep === "pending_payment" && (
             <div className="mb-6">
               <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                 <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Order Info
@@ -863,6 +1041,7 @@ const OrderPage = ({
                 </div>
               </div>
             </div>
+            )}
 
             {/* Payment Methods */}
             {orderStep === "pending_payment" && (
@@ -920,12 +1099,28 @@ const OrderPage = ({
                   </button>
                 </>
               )}
-              {(orderStep === "pending_payment" || orderStep === "coin_release") && (
+              {orderStep === "pending_release" && (
+                <>
+                  <button
+                    onClick={() => setShowCancelOrder(true)}
+                    className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors"
+                  >
+                    Cancel Order
+                  </button>
+                  <button
+                    onClick={() => setShowDispute(true)}
+                    className="px-6 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
+                  >
+                    | Order Dispute? <ChevronRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+              {orderStep === "completed_review" && (
                 <button
-                  onClick={() => setShowDispute(true)}
-                  className="px-6 py-3 rounded-full border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/5 transition-colors flex items-center gap-1.5"
+                  onClick={onClose}
+                  className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
                 >
-                  <Flag className="h-3.5 w-3.5" /> Report / Dispute
+                  Back to P2P
                 </button>
               )}
               {orderStep === "disputed" && (
@@ -1029,6 +1224,25 @@ const OrderPage = ({
                     <X className="h-3.5 w-3.5 text-muted-foreground cursor-pointer" />
                   </div>
                 </div>
+
+                {/* Dynamic chat messages */}
+                {extraMessages.map((m, i) => (
+                  <div key={i}>
+                    {m.kind === "info" ? (
+                      <div className="bg-muted/30 border border-border/40 rounded-lg px-3 py-2 flex items-start gap-2">
+                        <Send className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                        <p className="text-xs text-foreground">{m.text}</p>
+                      </div>
+                    ) : (
+                      <div className="flex justify-end">
+                        <div className="bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 max-w-[80%]">
+                          <p className="text-xs text-foreground break-words">{m.text}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{m.ts}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
 
               <div className="border-t border-border p-3 flex items-center gap-2">
@@ -1039,7 +1253,12 @@ const OrderPage = ({
                   placeholder="Enter your message"
                   className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
                 />
-                <button className="text-muted-foreground hover:text-foreground">
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/jpg,video/mp4" hidden onChange={handleFileAttach} />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload videos in MP4 format only · Supported image formats: JPG/PNG/JPEG · File upload limit: 100MB"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   <Plus className="h-5 w-5" />
                 </button>
                 <button className="text-primary hover:brightness-110">
@@ -1194,6 +1413,11 @@ const CancelOrderModal = ({
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-foreground">Are you sure you want to cancel this order?</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-xs text-foreground mb-4 flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+          <span>Cancelling may affect your completion rate and the seller may reject future trades with you. Only cancel if you have not paid or have already received a refund.</span>
         </div>
 
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-foreground mb-5 flex items-start gap-2">
