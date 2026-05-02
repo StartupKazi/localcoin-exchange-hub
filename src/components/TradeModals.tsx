@@ -847,7 +847,37 @@ const OrderPage = ({
           onClose={() => { setShowCompletedPopup(false); setOrderStep("completed_review"); }}
         />
       )}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* ───────── MOBILE LAYOUT ───────── */}
+      <div className="md:hidden min-h-screen flex flex-col bg-background">
+        <MobileOrderFlow
+          offer={offer}
+          selectedCrypto={selectedCrypto}
+          pay={pay}
+          quantity={quantity}
+          orderId={orderId}
+          dateStr={dateStr}
+          minutes={minutes}
+          seconds={seconds}
+          releaseMin={releaseMin}
+          releaseSec={releaseSec}
+          orderStep={orderStep}
+          setOrderStep={setOrderStep}
+          disputeReason={disputeReason}
+          setDisputeReason={setDisputeReason}
+          proofFiles={proofFiles}
+          setProofFiles={setProofFiles}
+          showAppealDetails={showAppealDetails}
+          setShowAppealDetails={setShowAppealDetails}
+          rating={rating}
+          setRating={setRating}
+          onShowConfirmPayment={() => setShowConfirmPayment(true)}
+          onShowCancelOrder={() => setShowCancelOrder(true)}
+          onClose={onClose}
+        />
+      </div>
+
+      {/* ───────── DESKTOP LAYOUT ───────── */}
+      <div className="hidden md:block max-w-7xl mx-auto px-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">{isBuy ? "Buy" : "Sell"} {selectedCrypto}</h1>
