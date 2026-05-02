@@ -17,8 +17,8 @@ type TradeOffer = {
 
 // ─── Modal Overlay ───────────────────────────────────────────────────
 const Overlay = ({ children, onClose }: { children: React.ReactNode; onClose: () => void }) => (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-    <div onClick={(e) => e.stopPropagation()} className="relative bg-card rounded-2xl shadow-2xl border border-border/30 max-h-[90vh] overflow-y-auto">
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6" onClick={onClose}>
+    <div onClick={(e) => e.stopPropagation()} className="relative bg-card rounded-2xl shadow-2xl border border-border/30 max-h-[90vh] overflow-y-auto w-full max-w-full sm:w-auto">
       {children}
     </div>
   </div>
@@ -27,7 +27,7 @@ const Overlay = ({ children, onClose }: { children: React.ReactNode; onClose: ()
 // ─── KYC Verification Modal ─────────────────────────────────────────
 export const KYCModal = ({ onClose }: { onClose: () => void }) => (
   <Overlay onClose={onClose}>
-    <div className="w-[460px] p-8 text-center">
+    <div className="w-full sm:w-[460px] p-6 sm:p-8 text-center">
       <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
         <X className="h-5 w-5" />
       </button>
