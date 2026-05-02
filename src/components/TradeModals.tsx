@@ -1052,6 +1052,13 @@ const OrderPage = ({
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Fiat Amount</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-success">{pay.toFixed(2)} {offer.currency}</span>
+                            <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Name</span>
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium text-foreground">RACHAEL MUUSI KILONZI</span>
@@ -1062,6 +1069,13 @@ const OrderPage = ({
                           <span className="text-muted-foreground">Payment Details</span>
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium text-foreground">0759810845</span>
+                            <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Order No.</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-foreground">{orderId.slice(0, 19)}</span>
                             <Copy className="h-3.5 w-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
                           </div>
                         </div>
