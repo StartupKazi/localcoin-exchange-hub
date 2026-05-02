@@ -55,6 +55,7 @@ const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [assetsOpen, setAssetsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [balanceHidden, setBalanceHidden] = useState(true);
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ const Header = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const assetsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -75,6 +77,7 @@ const Header = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpenDropdown(null);
       if (assetsRef.current && !assetsRef.current.contains(e.target as Node)) setAssetsOpen(false);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -236,12 +239,56 @@ const Header = () => {
             )}
           </div>
 
-          <button className="relative text-white/70 hover:text-primary transition-colors">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center">
-              3
-            </span>
-          </button>
+          <div ref={notifRef} className="relative">
+            <button
+              onClick={() => setNotifOpen(!notifOpen)}
+              className="relative text-white/70 hover:text-primary transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center">
+                3
+              </span>
+            </button>
+            {notifOpen && (
+              <div className="absolute top-full mt-2 right-0 w-80 rounded-lg border border-border/20 bg-[hsl(var(--nav-bg))] shadow-xl py-2 z-50">
+                <div className="px-4 py-2 flex items-center justify-between border-b border-white/10">
+                  <span className="text-sm font-semibold text-white">Notifications</span>
+                  <span className="text-xs text-white/50">3 new</span>
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {[
+                    { t: "Login From Another Device", b: "New sign-in from Chrome at Nairobi.", d: "21:16" },
+                    { t: "Deposit and win guaranteed rewards!", b: "Claim 5 USDT + Lucky Draw entry.", d: "14:53" },
+                    { t: "Login From Another Device", b: "New sign-in from Chrome at Nairobi.", d: "04:13" },
+                  ].map((n, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { navigate("/notifications"); setNotifOpen(false); }}
+                      className="w-full text-left px-4 py-3 hover:bg-white/5 border-b border-white/5 last:border-b-0"
+                    >
+                      <div className="flex items-start gap-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-destructive shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-white truncate">{n.t}</div>
+                          <div className="text-xs text-white/60 truncate">{n.b}</div>
+                          <div className="text-[10px] text-white/40 mt-0.5">{n.d}</div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="px-4 pt-2 border-t border-white/10">
+                  <button
+                    onClick={() => { navigate("/notifications"); setNotifOpen(false); }}
+                    className="w-full py-2 text-sm font-semibold text-primary hover:bg-white/5 rounded transition-colors"
+                  >
+                    View All Notifications
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div ref={profileRef} className="relative">
             <button
