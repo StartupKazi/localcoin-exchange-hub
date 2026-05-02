@@ -688,29 +688,15 @@ const TradeTable = ({
 
             {/* Payment methods + Action */}
             <div className="flex items-end justify-between gap-3">
-              <div className="flex flex-wrap gap-x-3 gap-y-1.5 flex-1 min-w-0">
-                {offer.paymentMethods.map((pm) => (
-                  <span key={pm} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="w-0.5 h-3 bg-primary rounded-full" />
-                    <span className="truncate">{pm}</span>
-                  </span>
-                ))}
+              <div className="text-xs text-muted-foreground flex-1 min-w-0">
+                {offer.paymentMethods.join("  ·  ")}
               </div>
-              {offer.eligible ? (
-                <button
-                  onClick={() => handleAction(offer)}
-                  className="shrink-0 px-5 py-2 rounded-full bg-success text-white text-sm font-semibold"
-                >
-                  {activeTab === "buy" ? "Buy" : "Sell"} {selectedCrypto}
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleAction(offer)}
-                  className="shrink-0 px-5 py-2 rounded-full border border-border text-foreground text-sm font-medium"
-                >
-                  Ineligible
-                </button>
-              )}
+              <button
+                onClick={() => handleAction(offer)}
+                className="shrink-0 px-5 py-2 rounded-full bg-success text-white text-sm font-semibold"
+              >
+                {activeTab === "buy" ? "Buy" : "Sell"} {selectedCrypto}
+              </button>
             </div>
           </div>
         ))}
