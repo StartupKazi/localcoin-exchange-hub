@@ -109,7 +109,7 @@ export const DosAndDontsModal = ({ onClose, onContinue }: { onClose: () => void;
       <h2 className="text-lg font-bold text-foreground mb-6 leading-snug">
         If you are unable to make payment or encounter other issues, you can choose to cancel your order.
       </h2>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
           <h3 className="text-destructive font-semibold text-sm mb-3 flex items-center gap-1">
             <X className="h-3.5 w-3.5" /> Don'ts
@@ -550,7 +550,7 @@ const DisputeModal = ({
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[560px] max-h-[85vh] overflow-y-auto p-6">
+      <div className="w-full sm:w-[560px] max-h-[85vh] overflow-y-auto p-5 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-foreground">Order Dispute</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
@@ -625,7 +625,7 @@ const OrderCompletedPopup = ({
   onClose: () => void;
 }) => (
   <Overlay onClose={onClose}>
-    <div className="w-[480px] p-8 relative">
+    <div className="w-full sm:w-[480px] p-6 sm:p-8 relative">
       <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
       <div className="text-center mb-6">
         <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-success/10 border-2 border-success flex items-center justify-center">
@@ -1845,7 +1845,7 @@ const ConfirmPaymentModal = ({
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[480px] p-6">
+      <div className="w-full sm:w-[480px] p-5 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-foreground">Confirm Payment</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
@@ -1963,7 +1963,7 @@ const CancelOrderModal = ({
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[500px] max-h-[85vh] overflow-y-auto p-6">
+      <div className="w-full sm:w-[500px] max-h-[85vh] overflow-y-auto p-5 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-foreground">Are you sure you want to cancel this order?</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
