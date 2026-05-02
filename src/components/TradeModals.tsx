@@ -49,7 +49,7 @@ export const KYCModal = ({ onClose }: { onClose: () => void }) => (
 // ─── Trading Requirements Modal ─────────────────────────────────────
 export const RequirementsModal = ({ onClose }: { onClose: () => void }) => (
   <Overlay onClose={onClose}>
-    <div className="w-[460px] p-8">
+    <div className="w-full sm:w-[460px] p-6 sm:p-8">
       <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
         <X className="h-5 w-5" />
       </button>
@@ -82,7 +82,7 @@ export const RequirementsModal = ({ onClose }: { onClose: () => void }) => (
 // ─── Security Protection Modal ───────────────────────────────────────
 export const SecurityModal = ({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => void }) => (
   <Overlay onClose={onClose}>
-    <div className="w-[460px] p-8 text-center">
+    <div className="w-full sm:w-[460px] p-6 sm:p-8 text-center">
       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
         <AlertCircle className="h-8 w-8 text-primary" />
       </div>
@@ -102,7 +102,7 @@ export const SecurityModal = ({ onClose, onConfirm }: { onClose: () => void; onC
 // ─── Dos and Don'ts Modal ────────────────────────────────────────────
 export const DosAndDontsModal = ({ onClose, onContinue }: { onClose: () => void; onContinue: () => void }) => (
   <Overlay onClose={onClose}>
-    <div className="w-[500px] p-8">
+    <div className="w-full sm:w-[500px] p-6 sm:p-8">
       <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
         <X className="h-5 w-5" />
       </button>
