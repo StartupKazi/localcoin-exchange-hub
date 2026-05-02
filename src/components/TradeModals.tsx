@@ -526,79 +526,80 @@ const TradeSuccessScreen = ({
   );
 };
 
-// ─── Dispute Modal ───────────────────────────────────────────────────
+// ─── Dispute Modal (2-panel wizard) ──────────────────────────────────
 const DisputeModal = ({
-  offer,
-  orderId,
   onClose,
   onSubmit,
 }: {
-  offer: TradeOffer;
-  orderId: string;
   onClose: () => void;
   onSubmit: () => void;
 }) => {
   const [reason, setReason] = useState("");
-  const [details, setDetails] = useState("");
+  const [step, setStep] = useState<"select" | "confirm">("select");
+
   const reasons = [
-    "I have paid but the seller has not released the coins",
-    "The seller is unresponsive",
-    "The payment details provided are incorrect",
-    "I suspect fraudulent activity",
-    "Other",
+    "I've completed my payment but the counterparty hasn't released the coins",
+    "I have paid more than the required amount",
+    "Counterparty requested payment to an account that mismatched with the verified name, and I have completed the payment",
+    "Counterparty requested additional payment (excluding transaction fees), and I have completed the payment.",
+    "I have paid to the wrong account",
+    "Counterparty engaged in fraudulent behavior, and I have completed the payment",
+    "Counterparty insulted me, and I do not wish to continue this trade",
+    "Other order dispute issues",
   ];
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[520px] p-6">
+      <div className="w-[560px] max-h-[85vh] overflow-y-auto p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Flag className="h-5 w-5 text-destructive" /> File a Dispute
-          </h2>
+          <h2 className="text-lg font-bold text-foreground">Order Dispute</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-xs text-foreground mb-5 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-          <span>Filing a dispute will freeze the escrowed funds until a resolution is reached. Please provide accurate information to help us resolve the issue quickly.</span>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-sm text-muted-foreground mb-1">Order ID</p>
-          <p className="text-sm font-mono text-foreground">{orderId.slice(0, 19)}</p>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-sm font-medium text-foreground mb-3">Select a reason for the dispute:</p>
-          <div className="space-y-2 border border-border rounded-xl p-3">
-            {reasons.map(r => (
-              <label key={r} className="flex items-start gap-3 cursor-pointer py-1.5">
-                <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${reason === r ? "border-primary" : "border-border"}`}>
-                  {reason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
-                </div>
-                <span className="text-sm text-foreground">{r}</span>
-              </label>
-            ))}
+        {step === "select" && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-foreground mb-4 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <span>Be assured that LocalCoin Trade places the Seller's crypto assets in escrow for all uncompleted orders.</span>
           </div>
+        )}
+
+        <div className="bg-muted/30 rounded-xl p-4 mb-5">
+          <p className="text-sm text-foreground mb-2">Before making an appeal, please attempt to resolve the issue with your counterparty.</p>
+          <button className="text-sm text-primary font-medium flex items-center gap-1.5">
+            <MessageCircle className="h-4 w-4" /> Contact now
+          </button>
         </div>
 
-        <div className="mb-6">
-          <label className="text-sm font-medium text-foreground mb-2 block">Additional Details</label>
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            placeholder="Describe the issue in detail..."
-            className="w-full border border-border rounded-xl p-3 text-sm text-foreground bg-transparent outline-none resize-none h-24 placeholder:text-muted-foreground focus:border-primary"
-          />
+        <p className="text-sm text-muted-foreground mb-3">What's the issue?</p>
+        <div className="space-y-3 mb-5">
+          {reasons.map((r) => (
+            <label key={r} className="flex items-start gap-3 cursor-pointer">
+              <div className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${reason === r ? "border-primary" : "border-border"}`}>
+                {reason === r && <div className="w-2 h-2 rounded-full bg-primary" />}
+              </div>
+              <span className="text-sm text-foreground leading-snug">{r}</span>
+            </label>
+          ))}
         </div>
+
+        {step === "confirm" && (
+          <p className="text-xs text-muted-foreground mb-5">
+            If there is no financial dispute over the order but you would like to report your counterparty's violation, please use the "Report User" button.
+            <span className="text-primary font-medium ml-1 cursor-pointer">Report User</span>
+          </p>
+        )}
 
         <div className="flex gap-3">
           <button
-            onClick={onSubmit}
+            onClick={() => {
+              if (!reason) return;
+              if (step === "select") setStep("confirm");
+              else onSubmit();
+            }}
             disabled={!reason}
-            className="flex-1 py-3 rounded-full bg-destructive text-white text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Submit Dispute
+            {step === "select" ? "Next" : "Submit Dispute"}
           </button>
           <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors">
             Cancel
@@ -608,6 +609,70 @@ const DisputeModal = ({
     </Overlay>
   );
 };
+
+// ─── Order Completed Pop-up ──────────────────────────────────────────
+const OrderCompletedPopup = ({
+  fiatAmount,
+  fiat,
+  quantity,
+  selectedCrypto,
+  onClose,
+}: {
+  fiatAmount: string;
+  fiat: string;
+  quantity: string;
+  selectedCrypto: string;
+  onClose: () => void;
+}) => (
+  <Overlay onClose={onClose}>
+    <div className="w-[480px] p-8 relative">
+      <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-success/10 border-2 border-success flex items-center justify-center">
+          <CheckCircle className="h-12 w-12 text-success" />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{fiatAmount} {fiat}</h2>
+        <p className="text-sm text-muted-foreground">Congrats, you've bought <span className="font-semibold text-foreground">{quantity} {selectedCrypto}</span>!</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <button onClick={onClose} className="py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-muted/30 transition-colors">
+          View Order
+        </button>
+        <button onClick={onClose} className="py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-muted/30 transition-colors">
+          View My Assets
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="bg-muted/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <Bitcoin className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Explore Spot X on LocalCoin Trade</p>
+            <p className="text-xs text-muted-foreground">Unlock new crypto opportunities and earn rewards!</p>
+          </div>
+          <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1">
+            Trade <ArrowRight className="h-3 w-3" />
+          </button>
+        </div>
+        <div className="bg-muted/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <TrendingUp className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Derivatives</p>
+            <p className="text-xs text-muted-foreground">Upgrade your trades with USDT Perpetual, Inverse Futures, and more.</p>
+          </div>
+          <button className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1">
+            Trade <ArrowRight className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </Overlay>
+);
 
 // ─── Escrow Status Banner ────────────────────────────────────────────
 const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" | "releasing" | "disputed"; selectedCrypto: string; quantity: string }) => {
