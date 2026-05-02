@@ -877,20 +877,11 @@ const OrderPage = ({
                     <div className="flex gap-3">
                       <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-foreground">Transfer via {offer.paymentMethods[0]}</span>
                           <button className="text-xs text-primary border border-primary/30 rounded-full px-3 py-1 hover:bg-primary/5">● Have issues in trading?</button>
                         </div>
-                        <div className="border border-border rounded-xl p-3 mb-3">
-                          <p className="text-xs"><span className="text-muted-foreground">Seller's name:</span> <span className="font-bold text-foreground">RACHAEL MUUSI KILONZI</span></p>
-                        </div>
-                        <div className="space-y-2 text-sm pl-3">
-                          <div className="flex justify-between"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success flex items-center gap-1">{pay.toFixed(2)} {offer.currency} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
-                          <div className="flex justify-between"><span className="text-muted-foreground">Name</span><span className="font-bold text-foreground flex items-center gap-1">RACHAEL MUUSI KILONZI <Copy className="h-3 w-3 cursor-pointer" /></span></div>
-                          <div className="flex justify-between"><span className="text-muted-foreground">Payment Details</span><span className="font-bold text-foreground flex items-center gap-1">0759810845 <Copy className="h-3 w-3 cursor-pointer" /></span></div>
-                          <div className="flex justify-between"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground flex items-center gap-1">{orderId.slice(0, 19)} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
-                          <button className="text-sm text-foreground flex items-center gap-1 mt-1">Order Details <ChevronDown className="h-3.5 w-3.5" /></button>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">See payment details in the "Payment Methods Accepted by the Seller" section below.</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
