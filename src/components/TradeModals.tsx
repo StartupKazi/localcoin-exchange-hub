@@ -710,7 +710,14 @@ const EscrowBanner = ({ status, selectedCrypto, quantity }: { status: "locked" |
 };
 
 // ─── Order Page (full-page, replaces dashboard) ─────────────────────
-type OrderStep = "pending_payment" | "pending_release" | "completed_review" | "disputed";
+type OrderStep =
+  | "pending_payment"
+  | "pending_release"
+  | "get_help"
+  | "dispute_select"
+  | "upload_proof"
+  | "completed_review"
+  | "disputed";
 type ChatMsg = { from: "system" | "buyer" | "seller"; text: string; ts: string; kind?: "text" | "file" | "info" };
 
 const OrderPage = ({
