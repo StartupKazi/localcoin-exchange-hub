@@ -1415,6 +1415,11 @@ const CancelOrderModal = ({
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
 
+        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-xs text-foreground mb-4 flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+          <span>Cancelling may affect your completion rate and the seller may reject future trades with you. Only cancel if you have not paid or have already received a refund.</span>
+        </div>
+
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-foreground mb-5 flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <span>The order cancellation reason can only be selected once. It affects whether this order should be counted in your completion rate calculation.</span>
