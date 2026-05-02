@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Megaphone, Gift, LineChart, Newspaper, Activity, Settings2, Mail, Inbox, Brush, ArrowRight } from "lucide-react";
+import { Bell, Megaphone, Gift, LineChart, Newspaper, Activity, Settings2, Mail, Inbox, Brush, ArrowRight, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -135,6 +135,7 @@ const Notifications = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<NotificationItem[]>(seed);
   const [active, setActive] = useState<Category>("all");
+  const [selected, setSelected] = useState<NotificationItem | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<Category, number> = {
@@ -155,6 +156,11 @@ const Notifications = () => {
   const markAllAsRead = () => setItems((prev) => prev.map((n) => ({ ...n, unread: false })));
   const markOneAsRead = (id: string) =>
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+
+  const openDetail = (n: NotificationItem) => {
+    markOneAsRead(n.id);
+    setSelected({ ...n, unread: false });
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-16 md:pb-0">
@@ -242,7 +248,7 @@ const Notifications = () => {
                             <div className="flex items-center justify-between mt-3">
                               <span className="text-xs text-muted-foreground">{n.time}</span>
                               <button
-                                onClick={() => markOneAsRead(n.id)}
+                                onClick={() => openDetail(n)}
                                 className="inline-flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
                               >
                                 View more <ArrowRight className="h-3.5 w-3.5" />
@@ -259,6 +265,60 @@ const Notifications = () => {
           </div>
         </div>
       </main>
+
+      {selected && (
+        <div
+          className="fixed inset-0 z-[100] bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="bg-card rounded-2xl shadow-xl border border-border/30 w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-border/40">
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  {(() => {
+                    const Icon = categoryIcon[selected.category];
+                    return <Icon className="h-4 w-4" />;
+                  })()}
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-bold text-foreground leading-tight">{selected.title}</h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {categories.find((c) => c.key === selected.category)?.label} · {selected.time}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5 overflow-y-auto">
+              <p className="text-sm text-foreground/85 leading-relaxed whitespace-pre-line">{selected.body}</p>
+            </div>
+            <div className="px-6 py-4 border-t border-border/40 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setSelected(null)}
+                className="px-4 py-2 rounded-full text-sm font-medium text-foreground/80 hover:bg-muted/40 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => { setSelected(null); navigate("/profile"); }}
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:brightness-110 transition"
+              >
+                Manage settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
       <MobileBottomNav />
     </div>
