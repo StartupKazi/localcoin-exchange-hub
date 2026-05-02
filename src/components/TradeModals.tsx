@@ -877,16 +877,6 @@ const OrderPage = ({
                     <div className="flex gap-3">
                       <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-foreground">Transfer via {offer.paymentMethods[0]}</span>
-                          <button className="text-xs text-primary border border-primary/30 rounded-full px-3 py-1 hover:bg-primary/5">● Have issues in trading?</button>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">See payment details in the "Payment Methods Accepted by the Seller" section below.</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-                      <div className="flex-1">
                         <p className="text-sm font-semibold text-foreground mb-1">After payment, click the button below so the seller can release the crypto.</p>
                         <p className="text-xs text-muted-foreground">Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.</p>
                       </div>
