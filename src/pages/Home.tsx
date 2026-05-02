@@ -18,11 +18,29 @@ import {
   Megaphone,
   Store,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+
+const ocbCryptoOptions = ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "TRX"];
+const ocbFiatOptions = ["KES", "USD", "NGN", "GHS", "TZS", "UGX"];
+const ocbPaymentMethods = [
+  { id: "bank", label: "Bank Transfer", icon: "🏦" },
+  { id: "card", label: "Bank Card", icon: "💳" },
+  { id: "mpesa", label: "M-Pesa", icon: "📱" },
+];
+const ocbRates: Record<string, Record<string, number>> = {
+  BTC: { KES: 8801652, USD: 86502, NGN: 135000000, GHS: 1200000, TZS: 220000000, UGX: 320000000 },
+  ETH: { KES: 258000, USD: 2450, NGN: 3800000, GHS: 35000, TZS: 6200000, UGX: 9000000 },
+  USDT: { KES: 129, USD: 1, NGN: 1550, GHS: 14, TZS: 2550, UGX: 3700 },
+  USDC: { KES: 129, USD: 1, NGN: 1550, GHS: 14, TZS: 2550, UGX: 3700 },
+  BNB: { KES: 78000, USD: 605, NGN: 940000, GHS: 8500, TZS: 1540000, UGX: 2230000 },
+  SOL: { KES: 17800, USD: 138, NGN: 215000, GHS: 1950, TZS: 352000, UGX: 510000 },
+  TRX: { KES: 32, USD: 0.25, NGN: 390, GHS: 3.5, TZS: 638, UGX: 925 },
+};
 
 const heroPattern =
   "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1600&q=80";
@@ -73,10 +91,33 @@ const testimonials = [
 const Home = () => {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [crypto, setCrypto] = useState("BTC");
-  const [payment, setPayment] = useState("Bank Transfer");
-  const [fiat, setFiat] = useState("USD");
-  const [region, setRegion] = useState("Worldwide");
+
+  // One-Click Buy widget state
+  const [ocbTab, setOcbTab] = useState<"buy" | "sell">("buy");
+  const [ocbCrypto, setOcbCrypto] = useState("BTC");
+  const [ocbFiat, setOcbFiat] = useState("KES");
+  const [ocbSpend, setOcbSpend] = useState("");
+  const [ocbReceive, setOcbReceive] = useState("");
+  const [ocbPayment, setOcbPayment] = useState("bank");
+  const [showOcbCrypto, setShowOcbCrypto] = useState(false);
+  const [showOcbFiat, setShowOcbFiat] = useState(false);
+  const [showOcbPayment, setShowOcbPayment] = useState(false);
+
+  const ocbIsBuy = ocbTab === "buy";
+  const ocbRate = ocbRates[ocbCrypto]?.[ocbFiat] || 1;
+  const ocbExchange = ocbRate.toLocaleString();
+  const ocbCurrentPayment = ocbPaymentMethods.find((p) => p.id === ocbPayment)!;
+
+  const handleOcbSpendChange = (val: string) => {
+    setOcbSpend(val);
+    const num = parseFloat(val.replace(/,/g, ""));
+    if (!isNaN(num) && num > 0) {
+      const result = ocbIsBuy ? num / ocbRate : num * ocbRate;
+      setOcbReceive(result < 0.0001 ? result.toFixed(8) : result.toLocaleString(undefined, { maximumFractionDigits: 6 }));
+    } else {
+      setOcbReceive("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-16 md:pb-0">
@@ -107,25 +148,151 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Find offers card */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 lg:p-8 shadow-2xl">
-              <div className="flex items-center gap-2 mb-5">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                <span className="text-primary text-xs font-semibold tracking-wider uppercase">Localcoinex Wallet</span>
+            {/* One-Click Buy card */}
+            <div className="w-full lg:max-w-[420px] lg:ml-auto">
+              <div className="bg-card rounded-2xl shadow-2xl border border-border/30 overflow-hidden">
+                {/* Buy / Sell tabs */}
+                <div className="flex">
+                  {(["buy", "sell"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => { setOcbTab(tab); setOcbSpend(""); setOcbReceive(""); }}
+                      className={`flex-1 py-4 text-center text-lg font-bold transition-colors ${
+                        ocbTab === tab ? "text-foreground bg-card" : "text-muted-foreground/40 bg-muted/30"
+                      }`}
+                    >
+                      {tab === "buy" ? "Buy" : "Sell"}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="p-5 space-y-3">
+                  {/* Spend input */}
+                  <div className="border border-border rounded-xl p-3">
+                    <label className="text-xs text-muted-foreground block mb-1">Spend</label>
+                    <div className="flex items-center justify-between">
+                      <input
+                        type="text"
+                        value={ocbSpend}
+                        onChange={(e) => handleOcbSpendChange(e.target.value)}
+                        placeholder={ocbIsBuy ? "1,400 - 1,440,000" : "Enter sell amount"}
+                        className="bg-transparent text-base text-foreground placeholder:text-muted-foreground/50 outline-none flex-1 min-w-0"
+                      />
+                      <div className="relative shrink-0">
+                        <button
+                          onClick={() => { setShowOcbFiat(!showOcbFiat); setShowOcbCrypto(false); }}
+                          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+                        >
+                          <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[10px] font-bold">
+                            {ocbIsBuy ? (ocbFiat === "KES" ? "KSh" : "$") : "₿"}
+                          </span>
+                          {ocbIsBuy ? ocbFiat : ocbCrypto}
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </button>
+                        {(ocbIsBuy ? showOcbFiat : showOcbCrypto) && (
+                          <div className="absolute right-0 top-8 bg-card border border-border rounded-lg shadow-lg z-10 min-w-[100px]">
+                            {(ocbIsBuy ? ocbFiatOptions : ocbCryptoOptions).map((opt) => (
+                              <button
+                                key={opt}
+                                onClick={() => {
+                                  ocbIsBuy ? setOcbFiat(opt) : setOcbCrypto(opt);
+                                  setShowOcbFiat(false); setShowOcbCrypto(false);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm hover:bg-muted/50 text-foreground"
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Receive input */}
+                  <div className="border border-border rounded-xl p-3">
+                    <label className="text-xs text-muted-foreground block mb-1">Receive ≈</label>
+                    <div className="flex items-center justify-between">
+                      <input
+                        type="text"
+                        value={ocbReceive}
+                        readOnly
+                        placeholder="Calculated automatically"
+                        className="bg-transparent text-base text-foreground placeholder:text-muted-foreground/50 outline-none flex-1 min-w-0"
+                      />
+                      <div className="relative shrink-0">
+                        <button
+                          onClick={() => { setShowOcbCrypto(!showOcbCrypto); setShowOcbFiat(false); }}
+                          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+                        >
+                          <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[10px] font-bold">
+                            {ocbIsBuy ? "₿" : "$"}
+                          </span>
+                          {ocbIsBuy ? ocbCrypto : ocbFiat}
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </button>
+                        {(ocbIsBuy ? showOcbCrypto : showOcbFiat) && (
+                          <div className="absolute right-0 top-8 bg-card border border-border rounded-lg shadow-lg z-10 min-w-[100px]">
+                            {(ocbIsBuy ? ocbCryptoOptions : ocbFiatOptions).map((opt) => (
+                              <button
+                                key={opt}
+                                onClick={() => {
+                                  ocbIsBuy ? setOcbCrypto(opt) : setOcbFiat(opt);
+                                  setShowOcbCrypto(false); setShowOcbFiat(false);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm hover:bg-muted/50 text-foreground"
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground px-1">1 {ocbCrypto} ≈ {ocbExchange} {ocbFiat}</p>
+
+                  {/* Payment Method */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-foreground">Payment Method</p>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowOcbPayment(!showOcbPayment)}
+                        className="w-full border border-border rounded-xl p-3 flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-sm">{ocbCurrentPayment.icon}</span>
+                          <span className="text-sm font-medium text-foreground">{ocbCurrentPayment.label}</span>
+                        </div>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                      {showOcbPayment && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-10">
+                          {ocbPaymentMethods.map((pm) => (
+                            <button
+                              key={pm.id}
+                              onClick={() => { setOcbPayment(pm.id); setShowOcbPayment(false); }}
+                              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/10 ${pm.id === ocbPayment ? "bg-primary/10" : ""}`}
+                            >
+                              <span className="text-sm">{pm.icon}</span>
+                              <span className="text-sm font-medium text-foreground">{pm.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => navigate("/one-click-buy")}
+                    disabled={!ocbSpend}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-base hover:brightness-110 transition disabled:bg-primary/20 disabled:text-primary disabled:cursor-not-allowed"
+                  >
+                    {ocbIsBuy ? `Buy ${ocbCrypto}` : `Sell ${ocbCrypto}`}
+                  </button>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-5">Find Your Offers</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="I want to" value={crypto} onChange={setCrypto} options={["BTC", "USDT", "ETH"]} />
-                <Field label="Currency" value={fiat} onChange={setFiat} options={["USD", "NGN", "KES", "EUR"]} />
-                <Field label="Payment" value={payment} onChange={setPayment} options={["Bank Transfer", "Mobile Money", "Cash"]} />
-                <Field label="Region" value={region} onChange={setRegion} options={["Worldwide", "Africa", "Europe"]} />
-              </div>
-              <button
-                onClick={() => navigate("/p2p")}
-                className="w-full mt-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold hover:brightness-110 transition flex items-center justify-center gap-2"
-              >
-                Find Offers <ArrowRight className="h-4 w-4" />
-              </button>
             </div>
           </div>
         </section>
