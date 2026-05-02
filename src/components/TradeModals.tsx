@@ -852,7 +852,7 @@ const OrderPage = ({
           <div className="flex-1">
             {/* Escrow Banner */}
             <EscrowBanner
-              status={orderStep === "disputed" ? "disputed" : orderStep === "coin_release" ? "releasing" : "locked"}
+              status={orderStep === "disputed" ? "disputed" : orderStep === "pending_release" ? "releasing" : "locked"}
               selectedCrypto={selectedCrypto}
               quantity={quantity}
             />
@@ -861,33 +861,118 @@ const OrderPage = ({
             <div className="bg-card rounded-xl border border-border/30 p-6 mb-6">
               {orderStep === "pending_payment" && (
                 <>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">⏱</span>
-                      <h3 className="text-lg font-semibold text-foreground">Complete Your Payment Within:</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Pending for Payment</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Note: The order will be automatically canceled if the button is not clicked by the deadline.{" "}
+                    <span className="font-bold text-primary">{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
+                  </p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      Make the payment according to the exact order details. Otherwise, you may incur asset loss or penalties for violating platform policy. The order will be canceled after the countdown timer ends.
+                    </p>
+                  </div>
+                  <p className="text-base font-semibold mb-4"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-foreground">Transfer via {offer.paymentMethods[0]}</span>
+                          <button className="text-xs text-primary border border-primary/30 rounded-full px-3 py-1 hover:bg-primary/5">● Have issues in trading?</button>
+                        </div>
+                        <div className="border border-border rounded-xl p-3 mb-3">
+                          <p className="text-xs"><span className="text-muted-foreground">Seller's name:</span> <span className="font-bold text-foreground">RACHAEL MUUSI KILONZI</span></p>
+                        </div>
+                        <div className="space-y-2 text-sm pl-3">
+                          <div className="flex justify-between"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success flex items-center gap-1">{pay.toFixed(2)} {offer.currency} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Name</span><span className="font-bold text-foreground flex items-center gap-1">RACHAEL MUUSI KILONZI <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Payment Details</span><span className="font-bold text-foreground flex items-center gap-1">0759810845 <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <div className="flex justify-between"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground flex items-center gap-1">{orderId.slice(0, 19)} <Copy className="h-3 w-3 cursor-pointer" /></span></div>
+                          <button className="text-sm text-foreground flex items-center gap-1 mt-1">Order Details <ChevronDown className="h-3.5 w-3.5" /></button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(minutes).padStart(2, "0")}</span>
-                      <span className="text-xl font-bold text-foreground">:</span>
-                      <span className="bg-success text-white text-xl font-bold px-2.5 py-1 rounded">{String(seconds).padStart(2, "0")}</span>
+                    <div className="flex gap-3">
+                      <span className="w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground mb-1">After payment, click the button below so the seller can release the crypto.</p>
+                        <p className="text-xs text-muted-foreground">Follow the payment instructions displayed on the order page. If any payment details appear unclear, do not proceed with the payment and cancel the order instead.</p>
+                      </div>
                     </div>
                   </div>
-                  <ul className="text-sm text-muted-foreground space-y-2 mb-6 list-disc pl-5">
-                    <li>Please complete payment within the allowed timeframe.</li>
-                    <li>After making the payment, click "Payment Completed" below.</li>
-                    <li>The order will be automatically canceled if not confirmed by the deadline.</li>
-                  </ul>
                 </>
               )}
 
-              {orderStep === "coin_release" && (
-                <div className="text-center py-4">
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-                    <Clock className="h-6 w-6 text-primary" />
+              {orderStep === "pending_release" && (
+                <>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Pending for release</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    The coins you've bought will be released within{" "}
+                    <span className="font-bold text-primary">{String(releaseMin).padStart(2, "0")}:{String(releaseSec).padStart(2, "0")}</span>.
+                  </p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      Please do not cancel the order unless you have received the refund of your payment. Please cooperate with the refund if the seller rejects continuing to trade with you.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Coin Release in Progress</h3>
-                  <p className="text-sm text-muted-foreground">Payment confirmed. The seller is releasing {quantity} {selectedCrypto} to your wallet...</p>
-                </div>
+                  <p className="text-base font-semibold mb-3"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success">{pay.toFixed(2)} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Price</span><span className="font-bold text-foreground">{offer.price} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Receive quantity</span><span className="font-bold text-foreground">{quantity} {selectedCrypto}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground">{orderId.slice(0, 19)}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order Time</span><span className="font-bold text-foreground">{dateStr}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Payment Method</span><span className="font-bold text-foreground">{offer.paymentMethods[0]}</span></div>
+                  </div>
+                </>
+              )}
+
+              {orderStep === "completed_review" && (
+                <>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Order completed</h3>
+                  <p className="text-sm text-muted-foreground mb-4">This order has concluded, and the assets are no longer locked by LocalCoin Trade.</p>
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-foreground leading-relaxed">
+                      The coin you purchased has been credited to your Funding Account. However, you may not be able to withdraw or sell it immediately due to the security protection period.
+                    </p>
+                  </div>
+                  <p className="text-base font-semibold mb-3"><span className="text-success">Buy</span> <span className="text-foreground">{selectedCrypto}</span></p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Fiat Amount</span><span className="font-bold text-success">{pay.toFixed(2)} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Price</span><span className="font-bold text-foreground">{offer.price} {offer.currency}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Receive quantity</span><span className="font-bold text-foreground">{quantity} {selectedCrypto}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order No.</span><span className="font-bold text-foreground">{orderId.slice(0, 19)}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Order Time</span><span className="font-bold text-foreground">{dateStr}</span></div>
+                    <div className="flex justify-between py-2"><span className="text-muted-foreground">Payment Method</span><span className="font-bold text-foreground">{offer.paymentMethods[0]}</span></div>
+                  </div>
+                  <div className="flex gap-5 mt-4 text-sm">
+                    <button onClick={() => setShowDispute(true)} className="text-foreground font-medium flex items-center gap-1">Order Dispute? <ChevronRight className="h-4 w-4" /></button>
+                    <button className="text-foreground font-medium flex items-center gap-1">View My Assets <ChevronRight className="h-4 w-4" /></button>
+                  </div>
+
+                  {/* Review */}
+                  <div className="mt-6 border border-border rounded-xl p-4">
+                    <h4 className="text-base font-bold text-foreground mb-1">Review</h4>
+                    {rating ? (
+                      <p className="text-sm text-success">Thanks for your feedback!</p>
+                    ) : (
+                      <>
+                        <p className="text-sm text-muted-foreground mb-3">How was your experience with this seller?</p>
+                        <div className="flex gap-3">
+                          <button onClick={() => setRating("good")} className="flex-1 py-3 rounded-xl border border-border hover:border-success hover:bg-success/5 flex items-center justify-center gap-2 transition-colors">
+                            <ThumbsUp className="h-5 w-5 text-foreground" /> <span className="font-semibold text-foreground">Good</span>
+                          </button>
+                          <button onClick={() => setRating("bad")} className="flex-1 py-3 rounded-xl border border-border hover:border-destructive hover:bg-destructive/5 flex items-center justify-center gap-2 transition-colors">
+                            <ThumbsDown className="h-5 w-5 text-foreground" /> <span className="font-semibold text-foreground">Bad</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
 
               {orderStep === "disputed" && (
@@ -905,6 +990,7 @@ const OrderPage = ({
               )}
 
               {/* 3-step progress */}
+              {orderStep !== "completed_review" && (
               <div className="flex items-center bg-muted/10 rounded-xl p-4 mt-4">
                 <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${stepIndex >= 1 ? "bg-success text-white" : "bg-muted text-muted-foreground"}`}>
@@ -931,9 +1017,11 @@ const OrderPage = ({
                   <span className={`text-sm ${stepIndex >= 3 ? "text-foreground" : "text-muted-foreground"}`}>Transaction Completed</span>
                 </div>
               </div>
+              )}
             </div>
 
-            {/* Order Info */}
+            {/* Order Info – only during pending payment, since other stages already show details */}
+            {orderStep === "pending_payment" && (
             <div className="mb-6">
               <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                 <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Order Info
@@ -953,6 +1041,7 @@ const OrderPage = ({
                 </div>
               </div>
             </div>
+            )}
 
             {/* Payment Methods */}
             {orderStep === "pending_payment" && (
@@ -1010,12 +1099,28 @@ const OrderPage = ({
                   </button>
                 </>
               )}
-              {(orderStep === "pending_payment" || orderStep === "coin_release") && (
+              {orderStep === "pending_release" && (
+                <>
+                  <button
+                    onClick={() => setShowCancelOrder(true)}
+                    className="px-8 py-3 rounded-full border border-border text-foreground text-sm font-medium hover:bg-muted/30 transition-colors"
+                  >
+                    Cancel Order
+                  </button>
+                  <button
+                    onClick={() => setShowDispute(true)}
+                    className="px-6 py-3 text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
+                  >
+                    | Order Dispute? <ChevronRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+              {orderStep === "completed_review" && (
                 <button
-                  onClick={() => setShowDispute(true)}
-                  className="px-6 py-3 rounded-full border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/5 transition-colors flex items-center gap-1.5"
+                  onClick={onClose}
+                  className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all"
                 >
-                  <Flag className="h-3.5 w-3.5" /> Report / Dispute
+                  Back to P2P
                 </button>
               )}
               {orderStep === "disputed" && (
@@ -1119,6 +1224,25 @@ const OrderPage = ({
                     <X className="h-3.5 w-3.5 text-muted-foreground cursor-pointer" />
                   </div>
                 </div>
+
+                {/* Dynamic chat messages */}
+                {extraMessages.map((m, i) => (
+                  <div key={i}>
+                    {m.kind === "info" ? (
+                      <div className="bg-muted/30 border border-border/40 rounded-lg px-3 py-2 flex items-start gap-2">
+                        <Send className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                        <p className="text-xs text-foreground">{m.text}</p>
+                      </div>
+                    ) : (
+                      <div className="flex justify-end">
+                        <div className="bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 max-w-[80%]">
+                          <p className="text-xs text-foreground break-words">{m.text}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{m.ts}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
 
               <div className="border-t border-border p-3 flex items-center gap-2">
@@ -1129,7 +1253,12 @@ const OrderPage = ({
                   placeholder="Enter your message"
                   className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
                 />
-                <button className="text-muted-foreground hover:text-foreground">
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/jpg,video/mp4" hidden onChange={handleFileAttach} />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload videos in MP4 format only · Supported image formats: JPG/PNG/JPEG · File upload limit: 100MB"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   <Plus className="h-5 w-5" />
                 </button>
                 <button className="text-primary hover:brightness-110">
