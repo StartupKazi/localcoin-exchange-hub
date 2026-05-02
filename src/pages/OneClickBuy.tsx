@@ -126,7 +126,7 @@ const OneClickBuy = () => {
             </div>
 
             {/* Right side – Buy/Sell card */}
-            <div className="w-full lg:w-[420px] shrink-0">
+            <div className="w-full lg:w-[520px] shrink-0">
               <div className="bg-card rounded-2xl shadow-sm border border-border/30 overflow-hidden">
                 {/* Buy / Sell tabs */}
                 <div className="flex">
