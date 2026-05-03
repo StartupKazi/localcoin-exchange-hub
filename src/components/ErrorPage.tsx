@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 import { AlertTriangle, Ban, Clock, Lock, SearchX, Zap } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export type ErrorCode = 401 | 403 | 404 | 419 | 429;
 
@@ -44,10 +42,8 @@ const ErrorPage = ({ code, title, description }: ErrorPageProps) => {
   const Icon = meta.Icon;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F7FA]">
-      <Header />
-      <main className="flex-1 flex items-center justify-center px-4 py-16 pb-20 sm:pb-16">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-12 text-center">
+    <main className="min-h-screen w-full flex items-center justify-center bg-[#F6F7FA] px-4 py-12">
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-12 text-center">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#021B38]/5">
             <Icon className="h-10 w-10 text-[#021B38]" />
           </div>
@@ -74,10 +70,8 @@ const ErrorPage = ({ code, title, description }: ErrorPageProps) => {
               Go Back
             </button>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 };
 
