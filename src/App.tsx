@@ -17,6 +17,10 @@ import Contact from "./pages/Contact.tsx";
 import Referral from "./pages/Referral.tsx";
 import Support from "./pages/Support.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Unauthorized from "./pages/Unauthorized.tsx";
+import Forbidden from "./pages/Forbidden.tsx";
+import PageExpired from "./pages/PageExpired.tsx";
+import TooManyRequests from "./pages/TooManyRequests.tsx";
 import Profile from "./pages/Profile.tsx";
 import Kyc from "./pages/Kyc.tsx";
 import Notifications from "./pages/Notifications.tsx";
@@ -109,6 +113,11 @@ const App = () => (
           <Route path="/admin/settings/notification" element={<NotificationSetting />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/401" element={<Unauthorized />} />
+          <Route path="/403" element={<Forbidden />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="/419" element={<PageExpired />} />
+          <Route path="/429" element={<TooManyRequests />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
